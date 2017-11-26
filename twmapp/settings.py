@@ -26,7 +26,11 @@ import os
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
+<<<<<<< HEAD
 #DEBUG = False
+=======
+#DEBUG = True
+>>>>>>> origin
 DEBUG = bool( os.environ.get('DJANGO_DEBUG', True) )
 
 ALLOWED_HOSTS = ['quiet-inlet-74985.herokuapp.com','127.0.0.1']
