@@ -1,0 +1,51 @@
+.sidebar-nav {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+#task-form, #proj-form, #report-form {
+	text-align: top;
+}
+
+#task-form tr, #proj-form tr, #report-form tr {
+	position: relative;
+	margin-bottom: 5px;
+}
+#task-form th, #proj-form th, #report-form th {
+	position: relative;
+    margin-left: 10px;
+    width: 100px;
+	vertical-align: top;
+}
+
+#task-form td, #proj-form td, #report-form td {
+	position: relative;
+    margin-left: 5px;
+	padding-top: 2px;
+	padding-bottom: 4px;
+}
+
+#id_description, #id_content {
+	width: 800px;
+	height: 250px;
+	overflow: scroll;
+	overflow-y: auto;
+	overflow-x: hidden;
+	resize: none;
+}
+
+#id_current_receivers {
+	width: auto;
+	min-height: 50px;
+	max-height: 150px;
+	overflow: scroll;
+	overflow-y: auto;
+	overflow-x: hidden;
+	resize: none;
+	border: 0px;
+}
+
+#id_receivers {
+	height: 150px;
+	overflow: auto;
+}

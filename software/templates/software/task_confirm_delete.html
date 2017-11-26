@@ -1,0 +1,15 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% if task.creator == request.user %}
+<h1>Delete Task</h1>
+
+<p>Are you sure you want to delete the task: <strong>{{ task }}</strong> ?</p>
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" action="" value="Yes, delete." />
+</form>
+{% else %}
+<p>You don't have permission to delele the task</p>
+{% endif %}
+{% endblock %}

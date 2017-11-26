@@ -1,0 +1,30 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Task: {{ task.title }}</h1>
+  {% load func_extras %}
+  {% updateprofile task request.user %}
+  {% if task.creator == request.user %}
+  <p><a href="{% url 'task_update' task.pk %}">Edit</a> | <a href="{% url 'task_delete' task.pk %}">Delete</a></p>
+  {% endif %}
+  <p><strong>Creator:</strong> {{ task.creator.last_name }} {{ task.creator.first_name }} - <strong>Date Created:</strong> {{ task.date_of_init|default_if_none:"" }}</p>
+  {% if task.status != 'fi' %}
+	<p><strong>Deadline</strong>: {{ task.deadline|default_if_none:"" }}</p>
+  {% endif %}
+  <p><strong>Status:</strong> {{ task.get_status_display }}
+  - <strong>Process:</strong> {{ task.process }}</p>
+  <p><strong>Receivers:</strong>{% for receivers in task.receiver.all %} {{ receivers.profile }}
+  {% if not forloop.last %}, {% endif %}{% endfor%}</p>
+  <p><strong>Description:</strong><pre>{{ task.description|linebreaks }}</pre></p>
+  
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Progresses</h4>
+	{% for prog in task.taskprogress_set.all %}
+    <hr style="margin-bottom: 5px; margin-top: 5px;">
+	<p><strong><a href="{{ prog.get_absolute_url }}">{{ prog.title }}</a></strong></p>
+    <p><strong>Reported by:</strong> {{ prog.reporter.last_name }} {{ prog.reporter.first_name }}, {{ prog.date_added }}</p>
+    <p><strong>Status:</strong> {{ prog.get_status_display }} - <strong>Process:</strong> {{ prog.process }}</p>
+    <p><strong>Content:</strong> {{ prog.content }}</p>
+    {% endfor %}
+  </div>
+{% endblock %}

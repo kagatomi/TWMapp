@@ -1,0 +1,31 @@
+{% extends "base_generic.html" %}
+<style>
+    p {
+      margin-bottom: 5px;
+    }
+</style>
+{% block content %}
+  <h1>{{ project.name }}</h1>
+  {% if perms.software.can_create_project %}
+	<p><a href="{% url 'project_update' project.pk %}">Edit</a> | <a href="{% url 'project_delete' project.pk %}">Delete</a></p>
+  {% endif %}
+  <p><strong>Customer:</strong> {{ project.customer }}</p>
+  <p><strong>Date of Start:</strong> {{ project.date_of_start }}</p>
+  <p><strong>Last Update:</strong> {{ project.last_update|default_if_none:"" }}</p>
+  <p><strong>Description:</strong> <pre>{{ project.description|linebreaks }}</pre></p>
+  
+
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Tasks</h4>
+    {% for task in project.task_set.all %}
+    <hr style="margin-bottom: 5px; margin-top: 5px;">
+    <p class="{% if task.status == 'fi' %}text-success
+					{% elif task.is_outofdate %}text-danger
+					{% else %}text-primary
+				{% endif %}">[{{ task.get_status_display }}] <a href="{{ task.get_absolute_url }}" style="color: inherit;">{{ task.title }}</a> - {% if task.status != 'fi' %}<strong>Deadline:</strong> {{task.deadline|default_if_none:""}}{% else %} FINISH!{% endif %}</p>
+    <p><strong>Status:</strong> {{ task.get_status_display }} - <strong>Process:</strong> {{ task.process }}</p>
+    <p><strong>Created by:</strong> {{ task.creator.profile }} - <strong>Last Updated:</strong> {{ task.last_update|default_if_none:"" }}</p>
+    
+    {% endfor %}
+  </div>
+{% endblock %}

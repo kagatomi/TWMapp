@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% if task.creator == request.user %}
+<h1>Task Form</h1>
+<form action="" method="post">
+	{% csrf_token %}
+	<table id="task-form">
+    {{ form.as_table }}
+	</table>
+    <input type="submit" value="Submit" />   
+</form>
+{% else %}
+<p>You don't have permission to edit the task</p>
+{% endif %}
+{% endblock %}

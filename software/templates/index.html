@@ -1,0 +1,18 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>TWM Home</h1>
+
+  <p>Welcome to <em>TWM Application</em>,</p>
+
+<h2>Overview</h2>
+
+  <p>General statistics:</p>
+  <ul>
+    <li><strong>Projects:</strong> {{ num_projects }}</li>
+	<li><strong>New Projects:</strong> {{ num_projects_new }}</li>
+    <li><strong>Tasks:</strong> {{ num_tasks }}</li>
+    <li><strong>New Tasks:</strong> {{ num_tasks_new }}</li>
+  </ul>
+
+{% endblock %}

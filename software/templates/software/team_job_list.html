@@ -1,0 +1,50 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<style>
+table, th, td {
+	margin-top: 20px;
+	border: 1px solid black;
+}
+
+th {
+	text-align: center;
+}
+
+td:not(.dif) {
+	padding-left: 10px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	text-align: left;
+}
+</style>
+<h1>Management Board</h1>
+<div id="table">
+	<table>
+		<thead>
+			<tr>
+			   <th>Name</th>
+			   <th>Tasks</th>
+			   <th>Total</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% load func_extras %}
+			{% for usr in team %}
+			<tr>	
+				<td width="200px">{{ usr.last_name }} {{ usr.first_name }}</td>
+				<td width="600px">
+					{% for job in task_list %}
+					{% if usr in job.receiver.all %}
+						<a href="{ url 'task-detail' tsk.pk }">{{ job }}</a>
+						{% if not forloop.last %} | {% endif %}						
+					{% endif %}
+					{% endfor %}
+				</td>
+				<td class="dif" align="center" width="50px">{{ usr.profile.current_task }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}

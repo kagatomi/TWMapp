@@ -1,0 +1,20 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Project List</h1>
+
+    {% if project_list %}
+    <ul>
+
+      {% for inst in project_list %}
+      <li style="margin-bottom: 5px;">
+        <a href="{{ inst.get_absolute_url }}">
+        {{ inst.name}}</a> - <strong>Last Updated:</strong> {{ inst.last_update|default_if_none:"" }}
+      </li>
+      {% endfor %}
+
+    </ul>
+    {% else %}
+      <p>There are no projects.</p>
+    {% endif %}       
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>My Job List</h1>
+	{% load func_extras %}
+    {% if task_list %}
+    <ul>
+	  
+	  <h3>Doing</h3>
+      {% for taskinst in task_list %}
+	  {% if taskinst.status != 'fi' %}	  
+	  {% is_mytask taskinst request.user as mytask%} {% job_view taskinst request.user as read %}
+	  {% if mytask %}
+      <li class="{% if taskinst.is_outofdate %}text-danger
+				 {% elif not read %}text-success
+				 {% elif read %}text-info
+				 {% endif %}">
+        <a href="{% url 'task-detail' taskinst.pk %}" style="color: inherit;">[{{taskinst.project}}] {{taskinst.title}}</a> (Deadline: {{ taskinst.deadline|default_if_none:"" }})        
+		- Updated: {{ taskinst.last_update }} {% if not read %}[ Unread ]{% endif %}
+      </li>
+	  {% endif %}{% endif %}
+      {% endfor %}
+    </ul>
+	<ul>
+	  <h3>Wait the others</h3>
+      {% for taskinst in task_list %}
+	  {% if taskinst.status != 'fi' %}
+	  {% is_mytask taskinst request.user as mytask%} {% job_view taskinst request.user as read %}
+	  {% if not mytask %}
+      <li class="{% if taskinst.is_outofdate %}text-danger
+				 {% elif not read %}text-success
+				 {% elif read %}text-info
+				 {% endif %}">
+        <a href="{% url 'task-detail' taskinst.pk %}" style="color: inherit;">[{{taskinst.project}}] {{taskinst.title}}</a> (Deadline: {{ taskinst.deadline|default_if_none:"" }})        
+		- Updated: {{ taskinst.last_update }} {% if not read %}[ Unread ]{% endif %}
+      </li>
+	  {% endif %}{% endif %}
+      {% endfor %}
+    </ul>
+	<ul>
+	  <h3>Finish</h3>
+      {% for taskinst in task_list %}
+	  {% if taskinst.status == 'fi' %} {% job_view taskinst request.user as read %}
+      <li style="color: black">
+        <a href="{% url 'task-detail' taskinst.pk %}" style="color: inherit;">[{{taskinst.project}}] {{taskinst.title}}</a> (Deadline: {{ taskinst.deadline|default_if_none:"" }})        
+		- Updated: {{ taskinst.last_update }} {% if not read %}[ Unread ]{% endif %}
+      </li>
+	  {% endif %}
+      {% endfor %}
+    </ul>
+    {% else %}
+      <p>There are no jobs.</p>
+    {% endif %}       
+{% endblock %}
