@@ -23,9 +23,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '7-3_1h998*(u(f)_9*e%h_i_uue_s@l8mz%k27c6=^m^1taf68'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+#DEBUG = False
+DEBUG = bool( os.environ.get('DJANGO_DEBUG', True) )
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://quiet-inlet-74985.herokuapp.com/','127.0.0.1']
 
 
 # Application definition
