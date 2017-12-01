@@ -1,12 +1,17 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-  <h4><a href="{{ taskprogress.task.get_absolute_url }}">Return the Task</a></h4>
-  <h1>{{ taskprogress.title }}</h1>
-  <p><strong>Reporter:</strong> {{ taskprogress.reporter }} </p>
+{% load bootstrap3 %}
+  <h4 style="margin-top: 10px;"><a href="{{ taskprogress.task.get_absolute_url }}" class="btn btn-dark">{% bootstrap_icon "arrow-left" %} Go to Task</a></h4>
+  <h1 class="font-weight-bold">{{ taskprogress.title }}</h1>
+  <p><strong>Reporter:</strong> {{ taskprogress.reporter.last_name }} {{ taskprogress.reporter.last_name }}</p>
   <p><strong>Date:</strong> {{ taskprogress.date_added|default_if_none:"" }}</p>
   <p><strong>Content:</strong><pre>{{ taskprogress.content|linebreaks }}</pre></p>
   {% if taskprogress.reporter == request.user %}
-  <p><a href="{% url 'report_update' taskprogress.pk %}">Edit</a> | <a href="{% url 'report_delete' taskprogress.pk %}">Delete</a></p>
+  <p><a href="{% url 'report_update' taskprogress.pk %}" class="btn btn-primary">
+            {% bootstrap_icon "edit" %} Edit </a>
+      <a href="{% url 'report_delete' taskprogress.pk %}" class="btn btn-danger">
+            {% bootstrap_icon "remove" %} Delete </a>
+  </p>
   {% endif %}
 {% endblock %}

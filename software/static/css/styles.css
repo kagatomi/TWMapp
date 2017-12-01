@@ -1,28 +1,56 @@
-.sidebar-nav {
+html, body, {
+	height: 100vh !important;
+}
+
+.container-fluid {
+	font-size: 14px;
+}
+
+.affix {
+	bottom: 100vh;
+}
+
+.sidebar-nav {	
+	width: 180px;
+	height: 100%;
     margin-top: 20px;
     padding: 0;
     list-style: none;
 }
-#task-form, #proj-form, #report-form {
-	text-align: top;
+
+.affix {
+	z-index: 9999;
 }
 
-#task-form tr, #proj-form tr, #report-form tr {
-	position: relative;
+a.active{
+	font-weight: bold;
+	background-color: silver;
+}
+
+.form-control {
+	font-size: 12.5px;
+}
+
+#id_title, #id_project, #id_name, #id_customer, #id_task {
+	width: 800px;
+	height: 30px;
 	margin-bottom: 5px;
 }
-#task-form th, #proj-form th, #report-form th {
-	position: relative;
-    margin-left: 10px;
-    width: 100px;
-	vertical-align: top;
+
+#id_deadline, #id_status, #id_process {
+	width: 175px;
+	height: 30px;
+	margin-bottom: 5px;
 }
 
-#task-form td, #proj-form td, #report-form td {
-	position: relative;
-    margin-left: 5px;
-	padding-top: 2px;
-	padding-bottom: 4px;
+#id_types {
+	width: 200px;
+	margin-bottom: 5px;
+}
+
+#id_receivers, #id_current_receivers {
+	width: 300px;
+	margin-bottom: 5px;
 }
 
 #id_description, #id_content {
@@ -49,3 +77,5 @@
 	height: 150px;
 	overflow: auto;
 }
+
+

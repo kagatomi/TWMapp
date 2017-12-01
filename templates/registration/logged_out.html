@@ -1,7 +1,8 @@
 {% extends "auth_page.html" %}
 
 {% block content %}
-<p>Logged out!</p>  
-
-<a href="{% url 'login'%}">Click here to login again.</a>
+{% load bootstrap3 %}
+<h1 class="font-weight-bold text-center" style="margin-top: 50px; margin-bottom: 10px;">Logged out!</h1>  
+<div class="text-center">
+<a href="{% url 'login'%}" class="btn btn-primary" style="font-size: 14px;">Click here to login again. {% bootstrap_icon "log-in" %}</a></div>
 {% endblock %}

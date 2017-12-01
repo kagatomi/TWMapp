@@ -4,6 +4,8 @@ import datetime #for checking renewal date range.
 
 from django.contrib.auth.models import User, Group
 from django import forms
+from django.utils import timezone
+
 
 from .models import Profile, Project, Task, TaskProgress, Type
 
@@ -15,10 +17,9 @@ class TaskForm(forms.ModelForm):
                       'types', ]    
         exclude = ['creator', 'receiver']
         widgets = {
-            'title': forms.TextInput(
-                attrs={'width': '200px',}),
             'deadline': forms.DateTimeInput(
-                attrs={'class': 'datetime-input',}),
+                format='%H:%M, %d-%m-%Y',
+                attrs={'class': 'datetime-input ', 'style': 'width'}),
         }
 
         
@@ -33,14 +34,17 @@ class TaskForm(forms.ModelForm):
         for g in user.groups.all():
             grplist.append(g.name)
 ##        self.fields['receiver'].queryset = Profile.objects.filter(user__groups__name__in=grplist).values('profile').order_by('user__first_name')
+        
         if task is None:
             self.fields['receivers'] = forms.ModelMultipleChoiceField(
                 queryset=Profile.objects.filter(
                     user__groups__name__in=grplist).order_by('grp'))
+            self.fields['deadline'].initial = timezone.now()
         else:
             self.fields['receivers'] = forms.ModelMultipleChoiceField(
                 queryset=Profile.objects.filter(user__groups__name__in=grplist).order_by('grp'),
                 initial=(u.profile for u in task.receiver.all()))
+
 
 class TaskReceiversForm(forms.ModelForm):
     class Meta:
@@ -102,5 +106,4 @@ class ReportForm(forms.ModelForm):
         self.fields['status'].empty_label = None
         self.fields['process'].empty_label = None
         self.fields['task'].queryset = Task.objects.filter(receiver=user)
-
 

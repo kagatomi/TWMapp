@@ -5,9 +5,15 @@
     }
 </style>
 {% block content %}
-  <h1>{{ project.name }}</h1>
+{% load bootstrap3 %}
+  <h1 class="font-weight-bold">{{ project.name }}</h1>
   {% if perms.software.can_create_project %}
-	<p><a href="{% url 'project_update' project.pk %}">Edit</a> | <a href="{% url 'project_delete' project.pk %}">Delete</a></p>
+	<p>
+    <a href="{% url 'project_update' project.pk %}" class="btn btn-primary">
+            {% bootstrap_icon "edit" %} Edit </a>
+    <a href="{% url 'project_delete' project.pk %}" class="btn btn-danger">
+            {% bootstrap_icon "remove" %} Delete </a>
+  </p>
   {% endif %}
   <p><strong>Customer:</strong> {{ project.customer }}</p>
   <p><strong>Date of Start:</strong> {{ project.date_of_start }}</p>
@@ -16,16 +22,38 @@
   
 
   <div style="margin-left:20px;margin-top:20px">
-    <h4>Tasks</h4>
-    {% for task in project.task_set.all %}
-    <hr style="margin-bottom: 5px; margin-top: 5px;">
-    <p class="{% if task.status == 'fi' %}text-success
-					{% elif task.is_outofdate %}text-danger
-					{% else %}text-primary
-				{% endif %}">[{{ task.get_status_display }}] <a href="{{ task.get_absolute_url }}" style="color: inherit;">{{ task.title }}</a> - {% if task.status != 'fi' %}<strong>Deadline:</strong> {{task.deadline|default_if_none:""}}{% else %} FINISH!{% endif %}</p>
-    <p><strong>Status:</strong> {{ task.get_status_display }} - <strong>Process:</strong> {{ task.process }}</p>
-    <p><strong>Created by:</strong> {{ task.creator.profile }} - <strong>Last Updated:</strong> {{ task.last_update|default_if_none:"" }}</p>
-    
-    {% endfor %}
+    <h4 class="font-weight-bold">Tasks</h4>
+    <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+         <th width="350px">Name</th>
+         <th width="130px">Deadline</th>
+         <th width="130px">Last Update</th>
+         <th width="60px">Process</th>
+         <th width="150px">Creator</th>         
+      </tr>
+    </thead>
+    <tbody>
+      {% for task in project.task_set.all %}
+      {% if task.status != 'fi' %}
+      <tr class="{% if task.is_outofdate %}danger{% else %}info{% endif %}">
+        <td> <a href="{{ task.get_absolute_url }}">[{{ task.get_status_display }}] {{ task.title }}</a></td>
+        <td>{{task.deadline|default_if_none:""}}</td>
+        <td>{{ task.last_update|default_if_none:"" }}</td>
+        <td>{{ task.process }}</td>
+        <td>{{ task.creator.profile }}</td>        
+      </tr>
+      {% endif %}{% endfor %}
+      {% for task in project.task_set.all %}
+      {% if task.status == 'fi' %}
+      <tr class="success">
+        <td> <a href="{{ task.get_absolute_url }}">[{{ task.get_status_display }}] {{ task.title }}</a></td>
+        <td>{{task.deadline|default_if_none:""}}</td>
+        <td>{{ task.last_update|default_if_none:"" }}</td>
+        <td>{{ task.process }}</td>
+        <td>{{ task.creator.profile }}</td>        
+      </tr>
+      {% endif %}{% endfor %}
+    </tbody>
   </div>
 {% endblock %}

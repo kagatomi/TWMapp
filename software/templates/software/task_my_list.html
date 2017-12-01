@@ -1,0 +1,70 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load bootstrap3 %}
+    <h1 class="font-weight-bold">My Job List</h1>
+	{% load func_extras %}
+    {% if task_list %}
+	<table class="table table-bordered table-hover">
+		<thead>
+			<tr>
+			   <th width="150px">Project</th>
+			   <th width="250px" >Task</th>
+			   <th width="130px">Deadline</th>
+			   <th width="150px">Creator</th>
+			   <th width="230px">Assign To</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for taskinst in task_list %}
+			{% if taskinst.status != 'fi' %}
+  			{% is_mytask taskinst request.user as mytask%} {% task_view taskinst request.user as read %}
+  			{% if mytask %}
+			<tr class="{% if taskinst.is_outofdate %}danger{% else %}info{% endif %} 
+						{% if not read %}font-weight-bold{% endif %}">	
+				<td>{{ taskinst.project.name }}</td>
+				<td>
+					{% if not read %}<span class="label label-warning"> Unread </span>{% endif %}
+					<a href="{% url 'task-detail' taskinst.pk %}" class="text-primary">
+						{{ taskinst.title }}
+					</a>
+				</td>
+				<td>{{ taskinst.deadline|default_if_none:"" }}</td>
+				<td>{{ taskinst.creator.last_name }} {{ taskinst.creator.first_name }}</td>
+				<td>
+					{% for usr in taskinst.receiver.all %}
+						{{ usr.last_name }} {{ usr.first_name }}{% if not forloop.last %}, {% endif %}						
+					{% endfor %}
+				</td>
+			</tr>
+			{% endif %}{% endif %}
+			{% endfor %}
+			{% for taskinst in task_list %}
+  			{% if taskinst.status == 'fi' %} {% task_view taskinst request.user as read %}
+			<tr class="success {% if not read %}font-weight-bold{% endif %}">	
+				<td>{{ taskinst.project.name }}</td>
+				<td>
+					{% if not read %}<span class="label label-warning"> Unread </span>{% endif %}
+					<a href="{% url 'task-detail' taskinst.pk %}" class="text-primary">
+						{{ taskinst.title }} 
+					</a>
+				</td>
+				<td>{{ taskinst.deadline|default_if_none:"" }}</td>					
+				<td>{{ taskinst.creator.last_name }} {{ taskinst.creator.first_name }}</td>
+				<td>
+					{% for usr in taskinst.receiver.all %}
+						{{ usr.last_name }} {{ usr.first_name }}{% if not forloop.last %}, {% endif %}						
+					{% endfor %}
+				</td>
+			</tr>
+			{% endif %}
+			{% endfor %}
+		</tbody>
+	</table>
+
+
+
+    {% else %}
+      <p>There are no jobs.</p>
+    {% endif %}       
+{% endblock %}

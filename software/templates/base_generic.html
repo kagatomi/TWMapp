@@ -2,71 +2,100 @@
 <html lang="en">
 <head>
   
-  {% block title %}<title>Local Library</title>{% endblock %}
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <link href="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.44/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
-  <script src="//cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
-  <script src="//cdn.bootcss.com/moment.js/2.17.1/moment.min.js"></script>
-  <script src="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.44/js/bootstrap-datetimepicker.min.js"></script>
-  <!-- Add additional CSS in static file -->
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+	{% block title %}<title>TWM Application</title>{% endblock %}
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link href="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.44/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+	<script src="//cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
+	<script src="//cdn.bootcss.com/moment.js/2.17.1/moment.min.js"></script>
+	<script src="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.44/js/bootstrap-datetimepicker.min.js"></script>
+	<!-- Add additional CSS in static file -->
+	{% load static %}
+	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  
 </head>
 
 <body>
+{% load func_extras %}
+  	<div class="container-fluid">
 
-  <div class="container-fluid">
+    	<div class="row">
 
-    <div class="row">
-      <div class="col-sm-2">
-      {% block sidebar %}
-      <ul class="sidebar-nav">
-			<li><a href="{% url 'index' %}">Home</a></li>
-			<li><a href="{% url 'projects' %}">All Projects</a></li>
-			<li><a href="{% url 'tasks' %}">All Tasks</a></li>
-      </ul>
+      	<div class="col-sm-2 border-bottom-0 border" >
+		{% block sidebar %}
+		{% url 'index' as index_url %}
+		{% url 'projects' as projects_url %}
+		{% url 'tasks' as tasks_url %}
+		<ul class="sidebar-nav nav-stacked" role="tablist" data-spy="affix" data-offset-top="1">
+			<li class="nav-item">
+				<a class="nav-link {% if request.get_full_path == index_url %}active{% endif %}" href="{% url 'index' %}">Home</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link {% if request.get_full_path == projects_url %}active{% endif %}" role="tab" href="{% url 'projects' %}">All Projects</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link {% if request.get_full_path == tasks_url %}active{% endif %}" href="{% url 'tasks' %}">All Tasks</a>
+			</li>
+		  	<hr />
+			{% url 'my-tasks' as my_tasks_url  %}
+			{% url 'my-reports' as my_reports_url %}
+			{% url 'project_create' as project_create_url %}
+			{% url 'task_create' as task_create_url %}
+			{% url 'report_create' as report_create_url %}
+		   	{% if user.is_authenticated %}
+			<li class="nav-item font-weight-bold">Hi, {{ user.last_name }} {{ user.first_name }}</li>
+			 {% number_unread_tasks user as nut %}
+			<li class="nav-item">
+		 		<a class="nav-link {% if request.get_full_path == my_tasks_url %}active{% endif %}" href="{% url 'my-tasks' %}">My Task List <span class="badge">{% if nut > 0 %}{{ nut }}{% endif %}</span></a>
+			</li>
+			<li class="nav-item">
+			 	<a class="nav-link {% if request.get_full_path == my_reports_url %}active{% endif %}" href="{% url 'my-reports' %}">My Report</a>
+			</li>
+			{% if perms.software.can_create_project %}
+			<li class="nav-item">
+			 	<a class="nav-link {% if request.get_full_path == project_create_url %}active{% endif %}" href="{% url 'project_create' %}">Create Project</a>
+			</li>
+			{% endif %}
+			{% if perms.software.is_member %}
+			<li class="nav-item">
+			 	<a class="nav-link {% if request.get_full_path == task_create_url %}active{% endif %}" href="{% url 'task_create' %}">Create Task</a>
+			</li>
+			<li class="nav-item">
+			 	<a class="nav-link {% if request.get_full_path == report_create_url %}active{% endif %}" href="{% url 'report_create' %}">Create Report</a>
+			</li>
+			{% endif %}
+			<li class="nav-item">
+			 	<a class="nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a>
+			</li>
+		    {% endif %} 
+		  	{% load func_extras %}	  
+		  	{% if perms.software.is_leader %}
+		  	<hr />
+		  	{% url 'all-tasked' as all_tasked_url %}
+		  	{% url 'my-team' as my_team_url %}
+		  	<li class="nav-item"><strong>Leader Menu</strong></li>
+		    {% if perms.software.is_leader %}
+		    {% empty_receiver request.user as empty_r %}
+		    <li class="nav-item">
+		   		<a class="nav-link {% if request.get_full_path == all_tasked_url %}active{% endif %}" href="{% url 'all-tasked' %}">All Team Tasks</a> <span class="badge">{% if empty_r > 0 %}{{ empty_r }}{% endif %}</span></li>
+		    <li class="nav-item">
+		   		<a class="nav-link {% if request.get_full_path == my_team_url %}active{% endif %}" href="{% url 'my-team' %}">My Team</a>
+		    </li>
+		    {% endif %}
+	  	</ul>
+	  	{% endif %}
 	  
+     	{% endblock %}
+      	</div>
+
+      	<div class="col-sm-10 tab-content">
+      	{% block content %}{% endblock %}
 	  
-	  <ul class="sidebar-nav">
-		   {% if user.is_authenticated %}
-			 <li>Hi, {{ user.last_name }} {{ user.first_name }}</li>
-			 <li><a href="{% url 'my-joblists' %}">My Job List</a> ({{ user.profile.new_job }})</li>
-			 <li><a href="{% url 'my-tasks' %}">My Task</a> ({{ user.profile.new_task }})</li>
-			 <li><a href="{% url 'my-reports' %}">My Report</a></li>
-			 {% if perms.software.can_create_project %}
-			 <li><a href="{% url 'project_create' %}">Create Project</a></li>
-			 {% endif %}
-			 {% if perms.software.is_member %}
-			 <li><a href="{% url 'task_create' %}">Create Task</a></li>
-			 <li><a href="{% url 'report_create' %}">Create Report</a></li>
-			 {% endif %}
-			 <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>   
-		   {% else %}
-			 <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>   
-		   {% endif %} 
-	  </ul> 
-	  {% load func_extras %}	  
-	  {% if perms.software.is_leader %}
-		   <hr />
-		   <ul class="sidebar-nav">
-		   <li>Leader</li>
-		   {% if perms.software.is_leader %}
-		   <li><a href="{% url 'all-tasked' %}">All Team Tasks ({% empty_receiver request.user %})</a></li>
-		   <li><a href="{% url 'my-team' %}">My Team</a></li>
-		   {% endif %}
-		   </ul>
-	  {% endif %}
-	  
-     {% endblock %}
-      </div>
-      <div class="col-sm-10 ">
-      {% block content %}{% endblock %}
-	  
-	  {% block pagination %}
+	  	{% block pagination %}
 		{% if is_paginated %}
 			<div class="pagination">
 				<span class="page-links">
@@ -82,18 +111,18 @@
 				</span>
 			</div>
 		{% endif %}
-	  {% endblock %} 
+	  	{% endblock %} 
 	  
-      </div>
-    </div>
-
-  </div>
+      	</div>
+      	</div>
+  	</div>
 </body>
 <script>
     $(function () {
         $('.datetime-input').datetimepicker({
-            format:'MM/DD/YYYY HH:mm',
+            format:'HH:mm, DD-MM-YYYY',
         });
     });
+
 </script>
 </html>

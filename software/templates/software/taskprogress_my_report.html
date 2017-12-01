@@ -1,19 +1,31 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h1>My Report List</h1>
+{% load bootstrap3 %}
+    <h1 class="font-weight-bold">My Report</h1>
 
     {% if taskprogress_list %}
-    <ul>
-
-      {% for inst in taskprogress_list %} 
-      <li>
-        [{{ inst.date_added }}] <a href="{% url 'report-detail' inst.pk %}">{{ inst.title }}</a><br>
-		<pre>Task: <a href="{{ inst.task.get_absolute_url }}"> {{ inst.task.title }}</a> - Project: <a href="{{ inst.task.project.get_absolute_url }}"> {{ inst.task.project.name }}</a></pre>
-      </li>
-      {% endfor %}
-    </ul>
-
+    <table class="table table-bordered table-hover table-striped">
+    <thead>
+      <tr>
+          <th width="100px">Date</th>
+          <th width="250px">Report</th>
+          <th width="175px">Task</th>
+          <th width="150px">Project</th>
+      </tr>
+    </thead>
+    <tbody>
+          {% for inst in taskprogress_list %} 
+          <tr> 
+              <td>{{ inst.date_added }}</td>
+              <td><a href="{% url 'report-detail' inst.pk %}">{{ inst.title }}</a></td>
+		          <td><a href="{{ inst.task.get_absolute_url }}"> {{ inst.task.title }}</a></td>
+              <td><a href="{{ inst.task.project.get_absolute_url }}"> {{ inst.task.project.name }}</a></td>
+          </tr>
+          {% endfor %}
+   
+    </tbody>
+    </table>
     {% else %}
       <p>There are no reports.</p>
     {% endif %}       

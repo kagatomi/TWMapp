@@ -1,42 +1,76 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h1>All Task of Your Team</h1>
-    {% load func_extras %}
-    {% if task_list %}
-    <ul><h3>New tasks should be added members of your team to the following tasks</h3>
-      {% for taskinst in task_list %}
-      {% receiver_list taskinst taskinst.process as r_list %}
-      {% if r_list == 'Empty' %}
-      <li>
-        <a href="{% url 'task-detail' taskinst.pk %}" class="{% if taskinst.is_outofdate %}text-danger{% endif %}">{{taskinst.title}}</a> (Deadline: {{ taskinst.deadline|default_if_none:"" }}) 
-        - Process: {{ taskinst.process }}
-        {% if perms.software.is_leader %}
-        - <a href="{% url 'task_receivers' taskinst.pk %}">Edit receivers of your team</a>  
-        {% endif %}<br>
-        <pre>{{ r_list }}</pre>    		
-      </li>
-      {% endif %}
-      {% endfor %}
-    </ul>
+{% load bootstrap3 %}
+	<h1 class="font-weight-bold">Management Board</h1>
+	{% if task_list %}
 
-    <ul><h3>Oversight</h3>
-      {% for taskinst in task_list %}
-      {% receiver_list taskinst taskinst.process as r_list %}
-      {% if r_list != 'Empty' %}
-      <li>
-        <a href="{% url 'task-detail' taskinst.pk %}" class="{% if taskinst.is_outofdate %}text-danger{% endif %}">{{taskinst.title}}</a> (Deadline: {{ taskinst.deadline|default_if_none:"" }}) 
-        - Process: {{ taskinst.process }}
-        {% if perms.software.is_leader %}
-        - <a href="{% url 'task_receivers' taskinst.pk %}">Edit receivers of your team</a>  
-        {% endif %}<br>
-        <pre>{{ r_list }}</pre>       
-      </li>
-      {% endif %}
-      {% endfor %}
-    </ul>
+	<table class="table table-bordered table-hover">
+		<thead>
+			<tr>
+			   <th width="150px">Project</th>
+			   <th width="300px">Task</th>
+			   <th width="120px">Deadline</th>
+			   <th width="50px" align="center">Status</th>
+			   <th width="300px">Receivers</th>
+			   <th width="20px"></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% load func_extras %}
+			{% for taskinst in task_list %}
+			{% if taskinst.status != 'fi' %}
+  			{% receiver_list taskinst taskinst.process as r_list %}
+  			{% if r_list == 'Empty' %}
+			<tr class="{% if taskinst.is_outofdate %}danger{% else %}warning{% endif %}">	
+				<td>{{ taskinst.project.name }}</td>
+				<td><a href="{% url 'task-detail' taskinst.pk %}">{{ taskinst.title }}</a></td>
+				<td>{{ taskinst.deadline|default_if_none:"" }}</td>
+				<td>{{ taskinst.get_status_display }}</td>
+				<td align="center"><strong>Empty!</strong></td>
+				<td><a href="{% url 'task_receivers' taskinst.pk %}">{% bootstrap_icon "plus" %}</a></td>
+			</tr>
+			{% endif %}{% endif %}{% endfor %}
+			{% for taskinst in task_list %}
+			{% if taskinst.status != 'fi' %}
+  			{% receiver_list taskinst taskinst.process as r_list %}
+  			{% if r_list != 'Empty' %}
+			<tr class="{% if taskinst.is_outofdate %}danger{% else %}info{% endif %}">	
+				<td>{{ taskinst.project.name }}</td>
+				<td><a href="{% url 'task-detail' taskinst.pk %}">{{ taskinst.title }}</a></td>
+				<td>{{ taskinst.deadline|default_if_none:"" }}</td>
+				<td>{{ taskinst.get_status_display }}</td>
+				<td>
+					{% for usr in taskinst.receiver.all %}
+						{{ usr.last_name }} {{ usr.first_name }}
+						{% if not forloop.last %}, {% endif %}						
+					{% endfor %}
+				</td>
+				<td><a href="{% url 'task_receivers' taskinst.pk %}">{% bootstrap_icon "plus" %}</a></td>
+			</tr>
+			{% endif %}{% endif %}{% endfor %}
+			{% for taskinst in task_list %}
+			{% if taskinst.status == 'fi' %}
+  			{% receiver_list taskinst taskinst.process as r_list %}
+  			{% if r_list != 'Empty' %}
+			<tr class="success">	
+				<td>{{ taskinst.project.name }}</td>
+				<td><a href="{% url 'task-detail' taskinst.pk %}">{{ taskinst.title }}</a></td>
+				<td>{{ taskinst.deadline|default_if_none:"" }}</td>
+				<td>{{ taskinst.get_status_display }}</td>
+				<td>
+					{% for usr in taskinst.receiver.all %}
+						{{ usr.last_name }} {{ usr.first_name }}
+						{% if not forloop.last %}, {% endif %}						
+					{% endfor %}
+				</td>
+				<td><a href="{% url 'task_receivers' taskinst.pk %}">{% bootstrap_icon "plus" %}</a></td>
+			</tr>
+			{% endif %}{% endif %}{% endfor %}
+		</tbody>
+	</table>
 
-    {% else %}
-      <p>There are no tasks of your team.</p>
+	{% else %}
+      	<p>There are no tasks of your team.</p>
     {% endif %}       
 {% endblock %}

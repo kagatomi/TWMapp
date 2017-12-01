@@ -14,7 +14,6 @@ urlpatterns = [
 
 
 urlpatterns += [   
-    url(r'^myjoblists/$', views.MyJobListsListView.as_view(), name='my-joblists'),
     url(r'^mytasks/$', views.MyTasksListView.as_view(), name='my-tasks'),
     url(r'^myreports/$', views.MyReportsListView.as_view(), name='my-reports'),
     url(r'^tasked/$', views.TasksAllListView.as_view(), name='all-tasked'),

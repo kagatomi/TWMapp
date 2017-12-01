@@ -34,7 +34,7 @@ class Task(models.Model):
 
     date_of_init = models.DateTimeField(blank=True, null=False)
     last_update = models.DateTimeField(auto_now=True)
-    deadline = models.DateTimeField(blank=False)
+    deadline = models.DateTimeField(blank=False, )
     types = models.ManyToManyField(Type, help_text="Select type of the task")
 
     creator = models.ForeignKey(User,
@@ -52,7 +52,7 @@ class Task(models.Model):
     @property
     def is_outofdate(self):
         if self.status != 'fi':
-            if self.deadline and timezone.now() > self.deadline:
+            if self.deadline and timezone.now() + datetime.timedelta(days=2) > self.deadline:
                 return True
         return False
 
@@ -65,13 +65,13 @@ class Task(models.Model):
         ('fi', 'Finish'),
     )
 
-    status = models.CharField(max_length=1,
+    status = models.CharField(max_length=2,
                               choices=STATUS,
                               default='n', help_text='New task')
 
     PROCESS = (
         ('Analysis', 'Analysis'),
-        ('Code', 'Change code'),
+        ('Code', 'Code'),
         ('Test', 'Test'),
     )
 
@@ -82,7 +82,7 @@ class Task(models.Model):
     class Meta:
         unique_together = (('title', 'project'))
         ordering = ["deadline"]
-        permissions = (("can_create_project", "Analysis Leader"),
+        permissions = (("can_create_project", "Manager"),
                        ("is_member", "Member"),
                        ("is_leader","Leader"),)
 
@@ -162,23 +162,16 @@ from django.dispatch import receiver
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_time_login = models.BooleanField(default=True)
     
     current_task = models.IntegerField(default=0)
     
-    new_job = models.IntegerField(default=0)
-    new_task = models.IntegerField(default=0)
-    new_project = models.IntegerField(default=0)
-    
-    viewed_job = models.ManyToManyField('Task',
-                                        null=True, blank=True,
-                                        related_name="viewed_job")
-    viewed_task = models.ManyToManyField('Task',
+    unread_task = models.ManyToManyField('Task',
                                          null=True, blank=True,
-                                         related_name="viewed_task")
-    viewed_project = models.ManyToManyField('Project',
+                                         related_name="unread_task")   
+    unread_project = models.ManyToManyField('Project',
                                             null=True, blank=True,
-                                            related_name="viewed_project")
+                                            related_name="unread_project") 
+
     grp = models.CharField(max_length=300, null=True, blank=True)
     
     class Meta:

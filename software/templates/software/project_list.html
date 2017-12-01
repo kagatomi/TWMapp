@@ -1,19 +1,30 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h1>Project List</h1>
+{% load bootstrap3 %}
+{% load func_extras %}
+    <h1 class="font-weight-bold">Project List</h1>
 
     {% if project_list %}
-    <ul>
-
+    <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+         <th width="55%">Project</th>
+         <th width="30%">Last Update</th>
+         <th width="15%">Number of Task</th>
+      </tr>
+    </thead>
+    <tbody>
       {% for inst in project_list %}
-      <li style="margin-bottom: 5px;">
-        <a href="{{ inst.get_absolute_url }}">
-        {{ inst.name}}</a> - <strong>Last Updated:</strong> {{ inst.last_update|default_if_none:"" }}
-      </li>
+      {% project_view inst request.user as read %}
+      <tr class="{% if not read %}font-weight-bold{% endif %}">
+          <td><a href="{{ inst.get_absolute_url }}" class="text-primary">{{ inst.name }}</a></td>
+          <td>{{ inst.last_update|default_if_none:"" }}</td>
+          <td align="center">{% number_task_of_project inst %}</td>
+      </tr>
       {% endfor %}
 
-    </ul>
+    </tbody>
     {% else %}
       <p>There are no projects.</p>
     {% endif %}       

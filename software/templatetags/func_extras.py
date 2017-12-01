@@ -13,51 +13,31 @@ def has_group(user, group_name):
 
 @register.simple_tag
 def updateprofile(task, user):
-    if task.creator == user:
-        if not task in user.profile.viewed_task.all():
-            if not user in task.receiver.all():
-                user.profile.viewed_task.add(task)
-                user.profile.new_task -= 1
-            else:            
-                user.profile.viewed_task.add(task)
-                user.profile.viewed_job.add(task)
-                user.profile.new_task -= 1
-                user.profile.new_job -= 1
-    else:
-        if user in task.receiver.all():
-            if not task in user.profile.viewed_job.all():
-                user.profile.viewed_job.add(task)
-                user.profile.new_job -= 1
+    if task in user.profile.unread_task.all():
+        user.profile.unread_task.remove(task)
                 
     user.profile.save()
     return ''
 
 @register.simple_tag
 def updateprofile_proj(project, user):
-    if not project in user.profile.viewed_project.all():
-        user.profile.viewed_project.add(project)
-        user.profile.new_project -= 1
+    if project in user.profile.unread_project.all():
+        user.profile.unread_project.remove(project)
 
     user.profile.save()
     return''
 
-@register.simple_tag
-def job_view(task, user):
-    if not task in user.profile.viewed_job.all():
-        return False
-    return True
-
 
 @register.simple_tag
 def task_view(task, user):
-    if not task in user.profile.viewed_task.all():
+    if task in user.profile.unread_task.all():
         return False
     return True
 
 
 @register.simple_tag
 def project_view(project, user):
-    if not project in user.profile.viewed_project.all():
+    if project in user.profile.unread_project.all():
         return False
     return True
 
@@ -70,15 +50,18 @@ def empty_receiver(user):
     
     count = 0
     for task in team_task.all():
-        list_receivers = ''
         receivers = task.receiver.filter(groups__name__contains=task.process)
-        count = len(receivers.all())
-        for rcvs in receivers.all():
-            list_receivers += str(rcvs.profile)
-            if count > 0: list_receivers += ', '
-        if list_receivers == '':
+        if len(receivers.all()) == 0:
             count += 1
     
+    return count
+
+@register.simple_tag
+def number_task_of_project(project):
+    count = 0
+    for task in Task.objects.all():
+        if task.project == project:
+            count += 1
     return count
 
 @register.assignment_tag
@@ -104,3 +87,14 @@ def is_mytask(task, user):
     if task.process in grplist :
         return True
     return False
+
+@register.assignment_tag
+def number_unread_tasks(user):
+    count = len(user.profile.unread_task.all())
+    grplist = []
+    for g in user.groups.all():
+        grplist.append(g.name)
+    for task in user.profile.unread_task.all():
+        if not task.process in grplist:
+            count -= 1
+    return count

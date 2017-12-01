@@ -1,24 +1,40 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h1>Task List</h1>
+{% load bootstrap3 %}
+{% load func_extras %}
+    <h1 class="font-weight-bold">Task List</h1>
 
     {% if task_list %}
-    <ul>
+    <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+         <th width="300px">Task</th>
+         <th width="130px">Deadline</th>
+         <th width="150px">Creator</th>
+         <th width="50px">Status</th>
+         <th width="50px">Process</th>
+         <th width="230px">Assign To</th>
+      </tr>
+    </thead>
+    <tbody>
       
       {% for inst in task_list %}
-      <li style="margin-bottom: 5px;">
-        <a href="{% url 'task-detail' inst.pk %}"
-           class="{% if inst.status == 'fi' %}text-success
-            {% elif inst.is_outofdate %}text-danger
-            {% else %}text-primary
-           {% endif %}">{{ inst }}</a> 
-        - <strong>Status:</strong> {{ inst.get_status_display }} - <strong>Process:</strong> {{ inst.process }}<br>
-        <strong>Created by:</strong> {{ inst.creator.profile }} - <strong>Last Updated:</strong> {{ inst.last_update|default_if_none:"" }}
+      <tr class="{% if inst.status == 'fi' %}success
+            {% elif inst.is_outofdate %}danger
+            {% else %}info
+           {% endif %}">
+        <td><a href="{% url 'task-detail' inst.pk %}"
+           >{{ inst }}</a></td>
+        <td>{{ inst.deadline }}</td>
+        <td>{{ inst.creator.profile }}</td>
+        <td>{{ inst.get_status_display }}</td>
+        <td>{{ inst.process }}</td>
+        <td>{% for u in inst.receiver.all %}{{ u.last_name }} {{ u.first_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
       </li>
       {% endfor %}
 
-    </ul>
+    </tbody>
     {% else %}
       <p>There are no tasks.</p>
     {% endif %}       

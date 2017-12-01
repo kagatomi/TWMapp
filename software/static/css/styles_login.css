@@ -1,0 +1,15 @@
+.container {
+	font-size: 14px;
+}
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+.form-control {
+	font-size: 13px;
+	text-align: : center;
+	margin-top: 10px; 
+	margin-bottom: 10px;
+}
