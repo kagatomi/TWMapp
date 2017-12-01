@@ -114,9 +114,21 @@ TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
 USE_I18N = True
 
-USE_L10N = True
+#USE_L10N = True
+DATETIME_FORMAT = 'H:i, d-m-Y'
+DATETIME_INPUT_FORMATS = ['%H:%M, %d-%m-%Y']
+
+DATE_FORMAT = 'd-m-Y'
+DATE_INPUT_FORMATS = ['%d-%m-%Y']
 
 USE_TZ = True
+
+# For send email
+EMAIL_HOST_USER = os.environ['SENDGRID_USERNAME']
+EMAIL_HOST= 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
 
 
 # Static files (CSS, JavaScript, Images)
@@ -138,3 +150,66 @@ DATABASES['default'].update(db_from_env)
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+# Bootstrap3 default settings
+BOOTSTRAP3 = {
+
+    # The URL to the jQuery JavaScript file
+    'jquery_url': '//code.jquery.com/jquery.min.js',
+
+    # The Bootstrap base URL
+    'base_url': '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/',
+
+    # The complete URL to the Bootstrap CSS file (None means derive it from base_url)
+    'css_url': None,
+
+    # The complete URL to the Bootstrap CSS file (None means no theme)
+    'theme_url': None,
+
+    # The complete URL to the Bootstrap JavaScript file (None means derive it from base_url)
+    'javascript_url': None,
+
+    # Put JavaScript in the HEAD section of the HTML document (only relevant if you use bootstrap3.html)
+    'javascript_in_head': False,
+
+    # Include jQuery with Bootstrap JavaScript (affects django-bootstrap3 template tags)
+    'include_jquery': False,
+
+    # Label class to use in horizontal forms
+    'horizontal_label_class': 'col-md-2',
+
+    # Field class to use in horizontal forms
+    'horizontal_field_class': 'col-md-10',
+
+    # Set HTML required attribute on required fields, for Django <= 1.8 only
+    'set_required': True,
+
+    # Set HTML disabled attribute on disabled fields, for Django <= 1.8 only
+    'set_disabled': False,
+
+    # Set placeholder attributes to label if no placeholder is provided.
+    # This also considers the 'label' option of {% bootstrap_field %} tags.
+    'set_placeholder': True,
+
+    # Class to indicate required (better to set this in your Django form)
+    'required_css_class': '',
+
+    # Class to indicate error (better to set this in your Django form)
+    'error_css_class': 'has-error',
+
+    # Class to indicate success, meaning the field has valid input (better to set this in your Django form)
+    'success_css_class': 'has-success',
+
+    # Renderers (only set these if you have studied the source and understand the inner workings)
+    'formset_renderers':{
+        'default': 'bootstrap3.renderers.FormsetRenderer',
+    },
+    'form_renderers': {
+        'default': 'bootstrap3.renderers.FormRenderer',
+    },
+    'field_renderers': {
+        'default': 'bootstrap3.renderers.FieldRenderer',
+        'inline': 'bootstrap3.renderers.InlineFieldRenderer',
+    },
+}
