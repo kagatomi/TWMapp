@@ -3,7 +3,7 @@
 {% block content %}
 {% load bootstrap3 %}
 <h1 class="font-weight-bold">Report Form</h1>
-<form action="" method="post">
+<form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {% bootstrap_form form layout='horizontal' %}
     {% buttons %}

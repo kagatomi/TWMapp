@@ -3,52 +3,56 @@
 {% block content %}
 {% load bootstrap3 %}
 	<h1 class="font-weight-bold">Management Board</h1>
+	<hr align="left" width="40%" style="margin-bottom: 5px; margin-top: 5px;">
 	{% if task_list %}
+	<div class="form-group has-feedback has-feedback-left pull-right" style="width: 25%" >
+      <input type="text" class="form-control" id="myInputall" onkeyup="filterall()" placeholder="Search">
+      <i class="glyphicon glyphicon-search form-control-feedback"></i>
+      <hr style="margin-bottom: 5px; margin-top: 5px;">
+    </div>
 
-	<table class="table table-bordered table-hover">
+	<table class="table table-bordered table-hover" id="myTable">
 		<thead>
 			<tr>
-			   <th width="150px">Project</th>
-			   <th width="300px">Task</th>
-			   <th width="120px">Deadline</th>
-			   <th width="50px" align="center">Status</th>
-			   <th width="300px">Receivers</th>
-			   <th width="20px"></th>
+			   <th width="18%">Project</th>
+			   <th width="30%">Task</th>
+			   <th width="15%">Deadline</th>
+			   <th width="5%" align="center">Status</th>
+			   <th width="30%">Receivers</th>
+			   <th width="2%"></th>
 			</tr>
 		</thead>
 		<tbody>
 			{% load func_extras %}
 			{% for taskinst in task_list %}
-			{% if taskinst.status != 'fi' %}
   			{% receiver_list taskinst taskinst.process as r_list %}
   			{% if r_list == 'Empty' %}
-			<tr class="{% if taskinst.is_outofdate %}danger{% else %}warning{% endif %}">	
+			<tr class="font-weight-bold font-italic {% if taskinst.is_outofdate %}danger{% elif taskinst.is_late %}warning{% else %}info{% endif %}">
 				<td>{{ taskinst.project.name }}</td>
-				<td><a href="{% url 'task-detail' taskinst.pk %}">{{ taskinst.title }}</a></td>
+				<td>{% if taskinst.is_outofdate %}<span class="label label-danger"> Late </span>
+					{% elif taskinst.is_late %}<span class="label label-warning"> Warning </span>{% endif %}
+					<a href="{% url 'task-detail' taskinst.pk %}">{{ taskinst.title }}</a></td>
 				<td>{{ taskinst.deadline|default_if_none:"" }}</td>
 				<td>{{ taskinst.get_status_display }}</td>
-				<td align="center"><strong>Empty!</strong></td>
+				<td align="center">Empty!</td>
 				<td><a href="{% url 'task_receivers' taskinst.pk %}">{% bootstrap_icon "plus" %}</a></td>
 			</tr>
-			{% endif %}{% endif %}{% endfor %}
+			{% endif %}{% endfor %}
 			{% for taskinst in task_list %}
-			{% if taskinst.status != 'fi' %}
   			{% receiver_list taskinst taskinst.process as r_list %}
   			{% if r_list != 'Empty' %}
-			<tr class="{% if taskinst.is_outofdate %}danger{% else %}info{% endif %}">	
+			<tr class="{% if taskinst.is_outofdate %}danger{% elif taskinst.is_late %}warning{% else %}info{% endif %}">	
 				<td>{{ taskinst.project.name }}</td>
-				<td><a href="{% url 'task-detail' taskinst.pk %}">{{ taskinst.title }}</a></td>
+				<td>{% if taskinst.is_outofdate %}<span class="label label-danger"> Late </span>
+					{% elif taskinst.is_late %}<span class="label label-warning"> Warning </span>{% endif %}
+					<a href="{% url 'task-detail' taskinst.pk %}">{{ taskinst.title }}</a></td>
 				<td>{{ taskinst.deadline|default_if_none:"" }}</td>
 				<td>{{ taskinst.get_status_display }}</td>
-				<td>
-					{% for usr in taskinst.receiver.all %}
-						{{ usr.last_name }} {{ usr.first_name }}
-						{% if not forloop.last %}, {% endif %}						
-					{% endfor %}
-				</td>
+				<td>{{ r_list }}</td>
 				<td><a href="{% url 'task_receivers' taskinst.pk %}">{% bootstrap_icon "plus" %}</a></td>
 			</tr>
-			{% endif %}{% endif %}{% endfor %}
+			{% endif %}{% endfor %}
+			{% comment %}
 			{% for taskinst in task_list %}
 			{% if taskinst.status == 'fi' %}
   			{% receiver_list taskinst taskinst.process as r_list %}
@@ -67,6 +71,7 @@
 				<td><a href="{% url 'task_receivers' taskinst.pk %}">{% bootstrap_icon "plus" %}</a></td>
 			</tr>
 			{% endif %}{% endif %}{% endfor %}
+			{% endcomment %}
 		</tbody>
 	</table>
 

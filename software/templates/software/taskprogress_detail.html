@@ -7,6 +7,13 @@
   <p><strong>Reporter:</strong> {{ taskprogress.reporter.last_name }} {{ taskprogress.reporter.last_name }}</p>
   <p><strong>Date:</strong> {{ taskprogress.date_added|default_if_none:"" }}</p>
   <p><strong>Content:</strong><pre>{{ taskprogress.content|linebreaks }}</pre></p>
+  <p><strong>Files:</strong>
+    {% if taskprogress.document %}
+    <a href='{{ MEDIA_URL }}{{ taskprogress.document }}' download="true">{{ taskprogress.document.name }}</a>
+    {% endif %}
+
+  </p>
+  
   {% if taskprogress.reporter == request.user %}
   <p><a href="{% url 'report_update' taskprogress.pk %}" class="btn btn-primary">
             {% bootstrap_icon "edit" %} Edit </a>

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'software.apps.SoftwareConfig',
     'bootstrap3',
+    'django_cleanup',
 ]
 
 MIDDLEWARE = [
@@ -66,7 +67,8 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'django.contrib.messages.context_processors.messages',                
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -115,8 +117,8 @@ TIME_ZONE = 'Asia/Ho_Chi_Minh'
 USE_I18N = True
 
 #USE_L10N = True
-DATETIME_FORMAT = 'H:i, d-m-Y'
-DATETIME_INPUT_FORMATS = ['%H:%M, %d-%m-%Y']
+DATETIME_FORMAT = 'd-m-Y, H:i'
+DATETIME_INPUT_FORMATS = ['%d-%m-%Y, %H:%M']
 
 DATE_FORMAT = 'd-m-Y'
 DATE_INPUT_FORMATS = ['%d-%m-%Y']
@@ -138,6 +140,10 @@ EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATIC_URL = '/static/'
+
+# Media files
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'

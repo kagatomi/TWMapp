@@ -4,9 +4,17 @@
 {% load bootstrap3 %}
 {% load func_extras %}
     <h1 class="font-weight-bold">Project List</h1>
+    <hr align="left" width="40%" style="margin-bottom: 5px; margin-top: 5px;">
 
     {% if project_list %}
-    <table class="table table-bordered table-hover">
+    
+    <div class="form-group has-feedback has-feedback-left pull-right" style="width: 25%" >
+      <input type="text" class="form-control" id="myInputall" onkeyup="filterall()" placeholder="Search">
+      <i class="glyphicon glyphicon-search form-control-feedback"></i>
+      <hr style="margin-bottom: 5px; margin-top: 5px;">
+    </div>
+
+    <table class="table table-bordered table-hover" id="myTable">
     <thead>
       <tr>
          <th width="55%">Project</th>
@@ -16,9 +24,11 @@
     </thead>
     <tbody>
       {% for inst in project_list %}
+      {% new_project inst as new %}
       {% project_view inst request.user as read %}
-      <tr class="{% if not read %}font-weight-bold{% endif %}">
-          <td><a href="{{ inst.get_absolute_url }}" class="text-primary">{{ inst.name }}</a></td>
+      <tr class="success {% if not read %}font-weight-bold{% endif %}">
+          <td>{% if new %}<span class="label label-primary"> New </span>{% endif %}
+            <a href="{{ inst.get_absolute_url }}" class="text-primary">{{ inst.name }}</a></td>
           <td>{{ inst.last_update|default_if_none:"" }}</td>
           <td align="center">{% number_task_of_project inst %}</td>
       </tr>

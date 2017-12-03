@@ -30,7 +30,7 @@
 		{% url 'index' as index_url %}
 		{% url 'projects' as projects_url %}
 		{% url 'tasks' as tasks_url %}
-		<ul class="sidebar-nav nav-stacked" role="tablist" data-spy="affix" data-offset-top="1">
+		<ul class="sidebar-nav nav-stacked" role="tablist" data-spy="affix" data-offset-top="-1">
 			<li class="nav-item">
 				<a class="nav-link {% if request.get_full_path == index_url %}active{% endif %}" href="{% url 'index' %}">Home</a>
 			</li>
@@ -81,7 +81,7 @@
 		    {% if perms.software.is_leader %}
 		    {% empty_receiver request.user as empty_r %}
 		    <li class="nav-item">
-		   		<a class="nav-link {% if request.get_full_path == all_tasked_url %}active{% endif %}" href="{% url 'all-tasked' %}">All Team Tasks</a> <span class="badge">{% if empty_r > 0 %}{{ empty_r }}{% endif %}</span></li>
+		   		<a class="nav-link {% if request.get_full_path == all_tasked_url %}active{% endif %}" href="{% url 'all-tasked' %}">All Team Tasks <span class="badge">{% if empty_r > 0 %}{{ empty_r }}{% endif %}</span></a></li>
 		    <li class="nav-item">
 		   		<a class="nav-link {% if request.get_full_path == my_team_url %}active{% endif %}" href="{% url 'my-team' %}">My Team</a>
 		    </li>
@@ -120,9 +120,27 @@
 <script>
     $(function () {
         $('.datetime-input').datetimepicker({
-            format:'HH:mm, DD-MM-YYYY',
+            format:'DD-MM-YYYY, HH:mm',
         });
     });
+
+    function filterall() {
+	// Declare variables 
+	var input, filter, table, tr, td, i;
+		input = document.getElementById("myInputall");
+		filter = input.value.toUpperCase();
+		table = document.getElementById("myTable").tBodies[0];
+		tr = table.getElementsByTagName("tr");
+
+		// Loop through all table rows, and hide those who don't match the search query
+		for (i = 0; i < tr.length; i++) {
+			if (tr[i].textContent.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+        } else {
+            tr[i].style.display = "none";
+        } 
+		}
+	}
 
 </script>
 </html>

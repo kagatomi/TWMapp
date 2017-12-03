@@ -7,9 +7,12 @@
 <table class="table table-bordered table-hover table-striped">
 	<thead>
 		<tr>
-		   <th width="200px">Name</th>
-		   <th width="600px">Tasks</th>
-		   <th width="50px">Total</th>
+		   <th width="25%">Name</th>
+		   <th width="33%">Current Tasks</th>
+		   <th width="33%">Other Tasks</th>
+		   <th align="center" width="3%">C</th>
+		   <th align="center" width="3%">O</th>
+		   <th align="center" width="3%">T</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -20,12 +23,22 @@
 			<td><ul style="margin-bottom: 5px; margin-left: -20px;">
 				{% for job in task_list %}
 				{% if job.status != 'fi' %}
-				{% if usr in job.receiver.all %}
-					<li><a href="{ url 'task-detail' tsk.pk }">{{ job }}</a></li>				
+				{% if usr in job.receiver.all and job.process in usr.profile.grp %}
+					<li><a href="{% url 'task-detail' job.pk %}">{{ job }}</a></li>				
 				{% endif %}{% endif %}
 				{% endfor %}
 			</ul></td>
-			<td align="center" >{{ usr.profile.current_task }}</td>
+			<td><ul style="margin-bottom: 5px; margin-left: -20px;">
+				{% for job in task_list %}
+				{% if job.status != 'fi' %}
+				{% if usr in job.receiver.all and not job.process in usr.profile.grp %}
+					<li><a href="{% url 'task-detail' job.pk %}">{{ job }}</a></li>				
+				{% endif %}{% endif %}
+				{% endfor %}
+			</ul></td>
+			<td class="font-weight-bold" align="center" >{{ usr.profile.current_task }}</td>
+			<td align="center" >{{ usr.profile.other_task }}</td>
+			<td align="center" >{{ usr.profile.all_task }}</td>
 		</tr>
 		{% endfor %}
 	</tbody>

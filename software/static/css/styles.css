@@ -7,7 +7,8 @@ html, body, {
 }
 
 .affix {
-	bottom: 100vh;
+	top: 0;
+	position: fixed;
 }
 
 .sidebar-nav {	
@@ -16,10 +17,6 @@ html, body, {
     margin-top: 20px;
     padding: 0;
     list-style: none;
-}
-
-.affix {
-	z-index: 9999;
 }
 
 a.active{
@@ -78,4 +75,6 @@ a.active{
 	overflow: auto;
 }
 
-
+[hidden] {
+	display: none !important;
+}

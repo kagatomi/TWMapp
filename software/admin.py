@@ -13,7 +13,6 @@ admin.site.register(Permission)
 
 class ProfileInline(admin.TabularInline):
     model = Profile
-    exclude = ['grp']
 
 class CustomUser(UserAdmin):
     inlines = [ProfileInline]

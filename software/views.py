@@ -18,10 +18,10 @@ def index(request):
     num_projects_new = 0
     num_tasks_new = 0
     for p in Project.objects.all():
-        if p.date_of_start + timedelta(days=7) < date.today():
+        if p.date_of_start + timedelta(days=7) > date.today():
             num_projects_new += 1
     for t in Task.objects.all():
-        if t.date_of_init + timedelta(days=1) < timezone.now():
+        if t.date_of_init + timedelta(days=1) > timezone.now():
             num_tasks_new += 1
     
     
@@ -99,7 +99,7 @@ class TasksAllListView(PermissionRequiredMixin,generic.ListView):
         grplist = []
         for g in self.request.user.groups.all():
             grplist.append(g.name)
-        return Task.objects.filter(process__in=grplist).order_by('deadline')
+        return Task.objects.filter(process__in=grplist).exclude(status='fi').order_by('deadline')
 
 
 class MyTeamView(PermissionRequiredMixin,generic.ListView):    
@@ -116,9 +116,14 @@ class MyTeamView(PermissionRequiredMixin,generic.ListView):
         context['team'] = User.objects.filter(groups__name__in=grplist).order_by('first_name')
         for u in User.objects.filter(groups__name__in=grplist).all():
             u.profile.current_task = 0
+            u.profile.other_task = 0
             for t in Task.objects.all():
                 if u in t.receiver.all() and t.status != 'fi':
-                    u.profile.current_task += 1
+                    if t.process in u.profile.grp:
+                        u.profile.current_task += 1
+                    else:
+                        u.profile.other_task += 1
+            u.profile.all_task = u.profile.current_task + u.profile.other_task
             u.profile.save()
         return context
     
@@ -204,7 +209,7 @@ class TaskCreate(PermissionRequiredMixin, CreateView):
     def form_valid(self, form):
         instance = form.save(commit=False)
         form.instance.creator = self.request.user
-        form.instance.date_of_init = datetime.datetime.now()
+        form.instance.date_of_init = timezone.now()
         instance.save()
         receivers = form.cleaned_data['receivers']
         form.save_m2m()
@@ -217,8 +222,8 @@ class TaskCreate(PermissionRequiredMixin, CreateView):
             instance.old_receiver.add(u) # Create old receiver
         
         # Add unread task for creator if the person isn't in receiver list
-        if not instance in self.request.user.profile.unread_task.all():
-            self.request.user.profile.unread_task.add(instance)
+        #if not instance in self.request.user.profile.unread_task.all():
+        #    self.request.user.profile.unread_task.add(instance)
 
         self.request.user.profile.save()
         instance.save()
@@ -265,10 +270,10 @@ class TaskUpdate(PermissionRequiredMixin, UpdateView):
                     u.profile.save()
 
         # Add unread task for creator if the person isn't in receiver list
-        u = instance.creator
-        if not instance in u.profile.unread_task.all():
-            u.profile.unread_task.add(instance)
-            u.profile.save()
+        # u = instance.creator
+        # if not instance in u.profile.unread_task.all():
+        #     u.profile.unread_task.add(instance)
+        #     u.profile.save()
 
         instance.save()
         
@@ -279,7 +284,7 @@ from .forms import TaskReceiversForm
 class TaskUpdateReceivers(PermissionRequiredMixin, UpdateView):
     model = Task
     permission_required = 'software.is_member'
-    template_name = "software/task_form_update.html"
+    template_name = "software/task_form.html"
     form_class = TaskReceiversForm
 
     def get_form_kwargs(self):
@@ -320,10 +325,10 @@ class TaskUpdateReceivers(PermissionRequiredMixin, UpdateView):
                     u.profile.save()
 
         # Add task was updated to unread list for creator
-        u = instance.creator
-        if not instance in u.profile.unread_task.all():
-            u.profile.unread_task.add(instance)
-            u.profile.save()
+        # u = instance.creator
+        # if not instance in u.profile.unread_task.all():
+        #     u.profile.unread_task.add(instance)
+        #     u.profile.save()
 
         instance.save()
         return HttpResponseRedirect(reverse('task_receivers', args=[str(instance.pk)]))
@@ -345,9 +350,9 @@ class TaskDelete(PermissionRequiredMixin, DeleteView):
                 u.profile.unread_task.remove(task)
             u.profile.save()
 
-        if task in task.creator.profile.unread_task.all():
-            task.creator.profile.remove(task)
-            task.creator.profile.save()
+        # if task in task.creator.profile.unread_task.all():
+        #     task.creator.profile.remove(task)
+        #     task.creator.profile.save()
             
         self.object.delete()
         return HttpResponseRedirect(self.get_success_url())
@@ -369,7 +374,7 @@ class ReportCreate(PermissionRequiredMixin, CreateView):
         instance.reporter = self.request.user
         instance.task.status = form.instance.status
         instance.task.process = form.instance.process
-        instance.date_added = datetime.datetime.now()
+        instance.date_added = timezone.now()
         instance.task.last_update = instance.last_update
         
         t = instance.task        
@@ -381,10 +386,10 @@ class ReportCreate(PermissionRequiredMixin, CreateView):
                 u.profile.save()
 
         # Notify for creator
-        u = instance.task.creator
-        if not t in u.profile.unread_task.all():
-            u.profile.unread_task.add(t)
-            u.profile.save()
+        # u = instance.task.creator
+        # if not t in u.profile.unread_task.all():
+        #     u.profile.unread_task.add(t)
+        #     u.profile.save()
         
         instance.task.save()
         instance.save()
@@ -393,10 +398,15 @@ class ReportCreate(PermissionRequiredMixin, CreateView):
 
 class ReportUpdate(PermissionRequiredMixin, UpdateView):
     model = TaskProgress
-    fields = ['title', 'content', 'status', 'process']
-    exclude = ['task', 'reporter']
     template_name = "software/taskprogress_form_update.html"
     permission_required = 'software.is_member'
+    form_class = ReportForm
+
+    def get_form_kwargs(self):
+        kwargs = super(ReportUpdate, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
 
     def form_valid(self, form):
         instance = form.save(commit=False)
@@ -412,10 +422,10 @@ class ReportUpdate(PermissionRequiredMixin, UpdateView):
                 u.profile.unread_task.add(t)
                 u.profile.save()
 
-        u = instance.task.creator
-        if not t in u.profile.unread_task.all():
-            u.profile.unread_task.add(t)
-            u.profile.save()
+        # u = instance.task.creator
+        # if not t in u.profile.unread_task.all():
+        #     u.profile.unread_task.add(t)
+        #     u.profile.save()
 
         instance.task.save()
         instance.save()
@@ -438,9 +448,9 @@ class ReportDelete(PermissionRequiredMixin, DeleteView):
                 u.profile.unread_task.add(t)
                 u.profile.save()
 
-        if not t in t.creator.profile.unread_task.all():
-            t.creator.profile.unread_task.add(t)
-            t.creator.profile.save()
+        # if not t in t.creator.profile.unread_task.all():
+        #     t.creator.profile.unread_task.add(t)
+        #     t.creator.profile.save()
         
         self.object.delete()
         return HttpResponseRedirect(self.get_success_url())

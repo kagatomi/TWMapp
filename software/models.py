@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
-
+import os
 
 # Create your models here.
 class Type(models.Model):  
@@ -19,7 +19,7 @@ from django.urls import reverse #Used to generate URLs by reversing the URL patt
 from django.conf import settings
 from django.utils import timezone
 from datetime import date
-import datetime
+import datetime, time
 import uuid
 
 
@@ -35,7 +35,7 @@ class Task(models.Model):
     date_of_init = models.DateTimeField(blank=True, null=False)
     last_update = models.DateTimeField(auto_now=True)
     deadline = models.DateTimeField(blank=False, )
-    types = models.ManyToManyField(Type, help_text="Select type of the task")
+    types = models.ManyToManyField(Type, help_text="Select types of the task")
 
     creator = models.ForeignKey(User,
                                 on_delete=models.SET_NULL,
@@ -52,6 +52,13 @@ class Task(models.Model):
     @property
     def is_outofdate(self):
         if self.status != 'fi':
+            if self.deadline and timezone.now() > self.deadline:
+                return True
+        return False
+
+    @property
+    def is_late(self):
+        if self.status != 'fi':
             if self.deadline and timezone.now() + datetime.timedelta(days=2) > self.deadline:
                 return True
         return False
@@ -59,15 +66,18 @@ class Task(models.Model):
     
     STATUS = (
         ('n', 'New'),
+        ('a', 'Analysising'),
         ('c', 'Coding'),
         ('t', 'Testing'),
         ('f', 'Fixing'),
+        ('w', 'Waiting'),
         ('fi', 'Finish'),
     )
 
     status = models.CharField(max_length=2,
                               choices=STATUS,
-                              default='n', help_text='New task')
+                              default='n', 
+                              help_text="Choose status for this task. Ex: New, Coding, Finish, etc.")
 
     PROCESS = (
         ('Analysis', 'Analysis'),
@@ -77,7 +87,8 @@ class Task(models.Model):
 
     process = models.CharField(max_length=10,
                                choices=PROCESS,
-                               default='Analysis', help_text='Analysising')
+                               default='Analysis', 
+                               help_text="Choose the team which is responsibility for this stage. Ex: Analysis for new task or analysising task")
     
     class Meta:
         unique_together = (('title', 'project'))
@@ -96,10 +107,20 @@ class Task(models.Model):
         return ', '.join([ types.name for types in self.types.all()[:3] ])
         display_types.short_description = 'Types'
 
+
+def user_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/report_<id>/<filename>
+    timestr = time.strftime("%y%m%d%H%M%S")
+    filename = timestr + '_' + filename
+    return 'user_{0}/task_{1}/{2}'.format(instance.reporter.id, instance.task.id, filename)
+
+
 class TaskProgress(models.Model):
     title = models.CharField(max_length=200, null=True)    
     task = models.ForeignKey('Task',
-                             null=False)    
+                             null=False)  
+    document = models.FileField(blank=True, null=True, upload_to=user_directory_path,
+                                help_text="Attach file here.")
     reporter = models.ForeignKey(User,
                                  on_delete=models.SET_NULL,
                                  null=True, blank=False)    
@@ -110,27 +131,31 @@ class TaskProgress(models.Model):
     
     STATUS = (
         ('n', 'New'),
+        ('a', 'Analysising'),
         ('c', 'Coding'),
         ('t', 'Testing'),
         ('f', 'Fixing'),
+        ('w', 'Waiting'),
         ('fi', 'Finish'),
     )
 
-    status = models.CharField(max_length=1,
+    status = models.CharField(max_length=2,
                               choices=STATUS,
                               blank=False,
-                              default='n', help_text='New task')
+                              default='n', 
+                              help_text="Choose status for this task. Ex: New, Coding, Finish, etc.")
 
     PROCESS = (
         ('Analysis', 'Analysis'),
-        ('Code', 'Change code'),
+        ('Code', 'Code'),
         ('Test', 'Test'),
     )
 
     process = models.CharField(max_length=10,
                                choices=PROCESS,
                                blank=False,
-                               default='Analysis', help_text='Analysising')
+                               default='Analysis', 
+                               help_text="Choose the team which is responsibility for this stage. Ex: Analysis for new task or analysising task")
 
     
     def get_absolute_url(self):
@@ -139,12 +164,15 @@ class TaskProgress(models.Model):
     def __str__(self):
         return '%s - (%s)' % (self.task,self.title)
 
+
+
+
 class Project(models.Model):
     
     name = models.CharField(max_length=200)
     customer = models.CharField(max_length=200)  
     description = models.TextField(max_length=2000,
-                                   help_text="Enter descriptions of the project")
+                                   help_text="Enter a description of the project")
 
     
     date_of_start = models.DateField(blank=True, null=False)
@@ -164,6 +192,8 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     
     current_task = models.IntegerField(default=0)
+    other_task = models.IntegerField(default=0)
+    all_task = models.IntegerField(default=0)
     
     unread_task = models.ManyToManyField('Task',
                                          null=True, blank=True,

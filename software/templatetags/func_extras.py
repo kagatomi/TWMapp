@@ -2,6 +2,9 @@ from django import template
 from django.contrib.auth.models import User, Group
 from software.models import Task
 
+from datetime import date, timedelta
+from django.utils import timezone
+import datetime
 
 register = template.Library()
 
@@ -46,7 +49,7 @@ def empty_receiver(user):
     grplist = []
     for g in user.groups.all():
         grplist.append(g.name)
-    team_task = Task.objects.filter(process__in=grplist).order_by('deadline')
+    team_task = Task.objects.filter(process__in=grplist).exclude(status='fi').order_by('deadline')
     
     count = 0
     for task in team_task.all():
@@ -78,6 +81,17 @@ def receiver_list(task, group):
     else:
         return list_receivers
 
+@register.assignment_tag
+def new_project(project):
+    if project.date_of_start + timedelta(days=7) > date.today():
+        return True
+    return False
+
+@register.assignment_tag
+def new_task(task):
+    if task.date_of_init + timedelta(days=1) > timezone.now():
+        return True
+    return False
 
 @register.assignment_tag
 def is_mytask(task, user):

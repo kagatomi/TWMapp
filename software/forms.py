@@ -10,16 +10,17 @@ from django.utils import timezone
 from .models import Profile, Project, Task, TaskProgress, Type
 
 class TaskForm(forms.ModelForm):   
+
     class Meta:
         model = Task
         fields = ['title', 'project', 'description',
-                      'deadline', 'status', 'process',
-                      'types', ]    
-        exclude = ['creator', 'receiver']
+                    'deadline', 'status', 
+                    'process', 'types',]    
+        exclude = ['creator', 'receiver',]
         widgets = {
             'deadline': forms.DateTimeInput(
-                format='%H:%M, %d-%m-%Y',
-                attrs={'class': 'datetime-input ', 'style': 'width'}),
+                format='%d-%m-%Y, %H:%M',
+                attrs={'class': 'datetime-input ',}),
         }
 
         
@@ -38,12 +39,14 @@ class TaskForm(forms.ModelForm):
         if task is None:
             self.fields['receivers'] = forms.ModelMultipleChoiceField(
                 queryset=Profile.objects.filter(
-                    user__groups__name__in=grplist).order_by('grp'))
+                    user__groups__name__in=grplist).order_by('grp'),
+                help_text="Choose the people who are responsibility for this task")
             self.fields['deadline'].initial = timezone.now()
         else:
             self.fields['receivers'] = forms.ModelMultipleChoiceField(
                 queryset=Profile.objects.filter(user__groups__name__in=grplist).order_by('grp'),
-                initial=(u.profile for u in task.receiver.all()))
+                initial=(u.profile for u in task.receiver.all()),
+                help_text="Choose the people who are responsibility for this task")
 
 
 class TaskReceiversForm(forms.ModelForm):
@@ -58,6 +61,7 @@ class TaskReceiversForm(forms.ModelForm):
         exclude = ['creator', 'receiver']
         widgets = {
             'deadline': forms.DateTimeInput(
+                format='%d-%m-%Y, %H:%M',
                 attrs={'class': 'datetime-input',}),
         }
 
@@ -87,23 +91,34 @@ class TaskReceiversForm(forms.ModelForm):
         if task is None:
             self.fields['receivers'] = forms.ModelMultipleChoiceField(
                 queryset=Profile.objects.filter(
-                    user__groups__name__in=grplist).order_by('grp'))
+                    user__groups__name__in=grplist).order_by('grp'),
+                help_text="Choose the people who are responsibility for this task")
         else:
             self.fields['receivers'] = forms.ModelMultipleChoiceField(
                 queryset=Profile.objects.filter(user__groups__name__in=grplist).order_by('grp'),
-                initial=(u.profile for u in task.receiver.all()))
+                initial=(u.profile for u in task.receiver.all()),
+                help_text="Choose the people who are responsibility for this task")
 
 
 class ReportForm(forms.ModelForm):
+
     class Meta:
         model = TaskProgress
-        fields = ['title', 'task', 'content', 'status', 'process']
-        exclude = ['reporter',]
+        fields = ['title', 'task', 'content', 'status', 'process','document' ]
+        exclude = ['reporter', ]
+        widgets = {
+            'document': forms.ClearableFileInput(attrs={'download':True,})
+        }
+
                 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user')
         super(ReportForm, self).__init__(*args, **kwargs)
+        report = kwargs.pop('instance')
+
         self.fields['status'].empty_label = None
-        self.fields['process'].empty_label = None
+        self.fields['process'].empty_label = None        
         self.fields['task'].queryset = Task.objects.filter(receiver=user)
+        if report is not None:
+            self.fields['task'].disabled = True
 

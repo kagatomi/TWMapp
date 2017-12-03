@@ -3,9 +3,15 @@
 {% block content %}
 {% load bootstrap3 %}
     <h1 class="font-weight-bold">My Report</h1>
+    <hr align="left" width="40%" style="margin-bottom: 5px; margin-top: 5px;">
 
     {% if taskprogress_list %}
-    <table class="table table-bordered table-hover table-striped">
+    <div class="form-group has-feedback has-feedback-left pull-right" style="width: 25%" >
+      <input type="text" class="form-control" id="myInputall" onkeyup="filterall()" placeholder="Search">
+      <i class="glyphicon glyphicon-search form-control-feedback"></i>
+      <hr style="margin-bottom: 5px; margin-top: 5px;">
+    </div>
+    <table class="table table-bordered table-hover table-striped" id="myTable">
     <thead>
       <tr>
           <th width="100px">Date</th>

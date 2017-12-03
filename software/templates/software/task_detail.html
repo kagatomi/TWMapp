@@ -26,12 +26,28 @@
   
   <div style="margin-left:20px;margin-top:20px">
     <h4 class="font-weight-bold">Progresses</h4>
-	{% for prog in task.taskprogress_set.all %}
-    <hr style="margin-bottom: 5px; margin-top: 5px;">
-	  <p><strong><a href="{{ prog.get_absolute_url }}">{{ prog.title }}</a></strong></p>
-    <p class="font-italic font-weight-light">By: {{ prog.reporter.last_name }} {{ prog.reporter.first_name }} at {{ prog.date_added }}</p>
-    <p><strong>Status:</strong> {{ prog.get_status_display }} - <strong>Process:</strong> {{ prog.process }}</p>
-    <p><strong>Content:</strong> <pre>{{ prog.content }}</pre></p>
-    {% endfor %}
+	    {% for prog in task.taskprogress_set.all %}
+      <hr style="margin-bottom: 5px; margin-top: 5px;">
+      <table class="table table-bordered">
+        <tr>
+  	      <td class="bg-light" colspan="3"><strong><a href="{{ prog.get_absolute_url }}">{{ prog.title }}</a></strong></td>
+        </tr>
+        <tr>
+          <td width="70%">By <strong>{{ prog.reporter.last_name }} {{ prog.reporter.first_name }}</strong> on <i><strong>{{ prog.date_added }}</strong></i></td>
+          <td width="15%"><strong>Status:</strong> {{ prog.get_status_display }}</td>
+          <td width="15%"><strong>Process:</strong> {{ prog.process }}</td>
+        </tr>
+        <tr>
+          <td colspan="3">{{ prog.content|linebreaks }}</td>
+        </tr>
+        {% if prog.document %}
+        <tr>
+          <td colspan="3">            
+            <a href='{{ MEDIA_URL }}{{ prog.document }}' download="true">{% bootstrap_icon "paperclip" %} {{ prog.document.name }}</a>            
+          </td>
+        </tr>
+        {% endif %}
+      </table>
+      {% endfor %}
   </div>
 {% endblock %}
