@@ -1,18 +1,71 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
+{% load func_extras %}
+<h1 class="font-weight-bold text-center" style="margin-bottom: 30px">Teamwork Management Home</h1>
 
-<h1 class="font-weight-bold">Teamwork Management Home</h1>
+  <div class="col-sm-7">
+  <div class="panel panel-default">
+  	<table class="table table-hover table-bordered">
+  		<thead>
+  			<tr class="panel-heading"><th colspan="2" class="panel-title">Your Tasks</th></tr>
+  			<tr>
+  				<th>Task</th>
+  				<th>Deadline</th>
+  			</tr>
+  		</thead>
+  		<tbody class="panel-body">
+  			{% for t in all_tasks|slice:":10" %}
+  			{% is_mytask t request.user as mytask%} {% task_view t request.user as read %}
+  			{% if mytask %}
+  			<tr class="{% if t.is_outofdate %}danger{% elif t.is_late %}warning{% else %}info{% endif %} 
+						{% if not read %}font-weight-bold font-italic{% endif %}">
+  				<td>{% if t.is_outofdate %}<span class="label label-danger"> Late </span>
+					{% elif t.is_late %}<span class="label label-warning"> Warning </span>{% endif %}
+					{% if not read %}<span class="label label-info"> Unread </span>{% endif %}
+  					<a href={{ t.get_url_absolute }}>{{ t }}</a>
+  				</td>
+  				<td>{{ t.deadline }}</td>
+  			</tr>
+  			{% endif %}{% endfor %}
+  			<tr><td colspan="2" class="text-center"><em><a href="{% url 'my-tasks' %}" style="text-decoration-line: none">View all</a></em></td></tr>
+  		</tbody>
+  	</table>
+  </div>
+  </div>
 
-  <p>Welcome to <em>TWM Application</em>,</p>
+  <div class="col-sm-5">
 
-<h2>Overview</h2>
+  <div class="panel panel-default">
+  	<table class="table table-bordered table-hover">
+  	<thead class="panel-heading">
+  		<th class="panel-title">Overview</th>
+  	</thead>
+  	<tbody class="panel-body">
+  	<td>
+  		<p>General statistics:</p>
+  		<ul>
+    	<li><strong>Projects:</strong> {{ num_projects }}</li>
+		<li><strong>Recently Started Projects:</strong> {{ num_projects_new }}</li>
+    	<li><strong>Tasks:</strong> {{ num_tasks }}</li>
+    	<li><strong>Recently Added Tasks:</strong> {{ num_tasks_new }}</li>
+  		</ul>
+  	</td>
+  	</tbody>
+  	</table>
+  </div>
 
-  <p>General statistics:</p>
-  <ul>
-    <li><strong>Projects:</strong> {{ num_projects }}</li>
-	<li><strong>Recently Started Projects:</strong> {{ num_projects_new }}</li>
-    <li><strong>Tasks:</strong> {{ num_tasks }}</li>
-    <li><strong>Recently Added Tasks:</strong> {{ num_tasks_new }}</li>
-  </ul>
+  <div class="panel panel-default">
+  	<table class="table table-bordered table-hover">
+  		<thead class="panel-heading"><th class="panel-title">Recently Project</th></thead>
+  		<tbody class="panel-body">
+  			<td>
+  			{% for p in all_projects %}
+  			<p><a href={{ p.get_url_absolute }}>{{ p }}</a></p>
+  			{% endfor %}
+  			</td>
+  		</tbody>
+  	</table>
+  </div>
+</div>
 {% endblock %}

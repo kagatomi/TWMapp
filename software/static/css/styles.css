@@ -1,5 +1,10 @@
-html, body, {
+body, {
 	height: 100vh !important;
+}
+
+h1 {
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 
 .container-fluid {

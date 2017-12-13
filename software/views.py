@@ -18,13 +18,14 @@ def index(request):
     num_projects_new = 0
     num_tasks_new = 0
     for p in Project.objects.all():
-        if p.date_of_start + timedelta(days=7) > date.today():
+        if p.date_of_start + timedelta(days=60) > date.today():
             num_projects_new += 1
     for t in Task.objects.all():
-        if t.date_of_init + timedelta(days=1) > timezone.now():
+        if t.date_of_init + timedelta(days=7) > timezone.now():
             num_tasks_new += 1
     
-    
+    all_projects = Project.objects.all().filter(date_of_start__gt=(date.today()-timedelta(days=60))).order_by('-date_of_start')
+    all_tasks = Task.objects.all().filter(receiver=request.user).order_by('-date_of_init')
         
     # Render the HTML template index.html with the data in the context variable
     return render(
@@ -33,7 +34,9 @@ def index(request):
         context={'num_projects':num_projects,
                  'num_tasks':num_tasks,
                  'num_projects_new': num_projects_new,
-                 'num_tasks_new':num_tasks_new},
+                 'num_tasks_new':num_tasks_new,
+                 'all_tasks':all_tasks,
+                 'all_projects':all_projects,},
     )
 
 from django.views import generic
