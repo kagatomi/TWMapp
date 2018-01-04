@@ -57,12 +57,13 @@
 
   <div class="panel panel-default">
   	<table class="table table-bordered table-hover">
-  		<thead class="panel-heading"><th class="panel-title">Recently Project</th></thead>
+  		<thead class="panel-heading"><th class="panel-title">Recently Projects</th></thead>
   		<tbody class="panel-body">
   			<td>
-  			{% for p in all_projects %}
+  			{% for p in all_projects|slice:":5" %}
   			<p><a href={{ p.get_url_absolute }}>{{ p }}</a></p>
   			{% endfor %}
+        <tr><td colspan="2" class="text-center"><em><a href="{% url 'projects' %}" style="text-decoration-line: none">View all</a></em></td></tr>
   			</td>
   		</tbody>
   	</table>

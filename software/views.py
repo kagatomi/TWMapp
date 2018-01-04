@@ -156,7 +156,7 @@ class ProjectCreate(PermissionRequiredMixin, CreateView):
             u.profile.unread_project.add(instance)        
             u.profile.save()            
         
-        return HttpResponseRedirect(reverse('projects') )
+        return HttpResponseRedirect(reverse('project-detail', args=[str(instance.pk)]))
     
 
 class ProjectUpdate(PermissionRequiredMixin, UpdateView):
@@ -174,7 +174,7 @@ class ProjectUpdate(PermissionRequiredMixin, UpdateView):
                 u.profile.save()
 
         instance.save()
-        return HttpResponseRedirect(reverse('projects') )
+        return HttpResponseRedirect(reverse('project-detail', args=[str(instance.pk)]))
 
 class ProjectDelete(PermissionRequiredMixin, DeleteView):
     model = Project
@@ -182,17 +182,16 @@ class ProjectDelete(PermissionRequiredMixin, DeleteView):
     permission_required = 'software.can_create_project'
 
     def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        
+                
         # Remove notification if a unread project were removed
-        project = self.object.project
+        project = self.get_object()
         for u in User.objects.all():
             if project in u.profile.unread_project.all():
                 u.profile.unread_project.remove(project)
             u.profile.save()
 
-        self.object.delete()
-        return HttpResponseRedirect(self.get_success_url())
+        project.delete()
+        return HttpResponseRedirect(reverse('projects') )
 
 
 
@@ -230,7 +229,7 @@ class TaskCreate(PermissionRequiredMixin, CreateView):
 
         self.request.user.profile.save()
         instance.save()
-        return HttpResponseRedirect(reverse('my-tasks') )
+        return HttpResponseRedirect(reverse('task-detail', args=[str(instance.pk)]))
 
 class TaskUpdate(PermissionRequiredMixin, UpdateView):
     model = Task
@@ -280,7 +279,7 @@ class TaskUpdate(PermissionRequiredMixin, UpdateView):
 
         instance.save()
         
-        return HttpResponseRedirect(reverse('my-tasks'))
+        return HttpResponseRedirect(reverse('task-detail', args=[str(instance.pk)]))
 
 from .forms import TaskReceiversForm
 
@@ -334,7 +333,7 @@ class TaskUpdateReceivers(PermissionRequiredMixin, UpdateView):
         #     u.profile.save()
 
         instance.save()
-        return HttpResponseRedirect(reverse('task_receivers', args=[str(instance.pk)]))
+        return HttpResponseRedirect(reverse('all_tasked'))
 
         
 class TaskDelete(PermissionRequiredMixin, DeleteView):
@@ -343,10 +342,9 @@ class TaskDelete(PermissionRequiredMixin, DeleteView):
     permission_required = 'software.is_member'
 
     def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
         
         # Remove task from unread list 
-        task = self.object        
+        task = self.get_object()       
         
         for u in task.receiver.all():
             if task in u.profile.unread_task.all():
@@ -357,8 +355,8 @@ class TaskDelete(PermissionRequiredMixin, DeleteView):
         #     task.creator.profile.remove(task)
         #     task.creator.profile.save()
             
-        self.object.delete()
-        return HttpResponseRedirect(self.get_success_url())
+        task.delete()
+        return HttpResponseRedirect(reverse('tasks') )
 
 from .forms import ReportForm
 
@@ -441,10 +439,9 @@ class ReportDelete(PermissionRequiredMixin, DeleteView):
     permission_required = 'software.is_member'
 
     def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
+        
         # Notify if report is removed
-        t = self.object.task            
+        t = self.get_object()            
 
         for u in t.receiver.all():
             if not t in u.profile.unread_task.all():
@@ -455,5 +452,5 @@ class ReportDelete(PermissionRequiredMixin, DeleteView):
         #     t.creator.profile.unread_task.add(t)
         #     t.creator.profile.save()
         
-        self.object.delete()
-        return HttpResponseRedirect(self.get_success_url())
+        t.delete()
+        return HttpResponseRedirect(reverse('my-reports') )

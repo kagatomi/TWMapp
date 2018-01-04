@@ -21,71 +21,82 @@
 
 <body>
 {% load func_extras %}
+{% load bootstrap3 %}
   	<div class="container-fluid">
 
     	<div class="row">
 
-      	<div class="col-sm-2 border-bottom-0 border" >
+      	<div class="col-sm-2 border-bottom-0 border-left-0 border-top-0 border text-light bg-dark" style="min-height: 100vh;">
 		{% block sidebar %}
 		{% url 'index' as index_url %}
 		{% url 'projects' as projects_url %}
 		{% url 'tasks' as tasks_url %}
 		<ul class="sidebar-nav nav-stacked" role="tablist" data-spy="affix" data-offset-top="-1">
-			<li class="nav-item">
-				<a class="nav-link {% if request.get_full_path == index_url %}active{% endif %}" href="{% url 'index' %}">Home</a>
+			<li class="nav-item font-weight-bold">Hi, {{ user.last_name }} {{ user.first_name }}
+				({% if perms.software.can_create_project %}Manager{% elif perms.software.is_leader %}Leader{% else %}Member{% endif %})
 			</li>
 			<li class="nav-item">
-				<a class="nav-link {% if request.get_full_path == projects_url %}active{% endif %}" role="tab" href="{% url 'projects' %}">All Projects</a>
+			 	<a class="nav-link text-light" href="{% url 'logout'%}?next={{request.path}}">{% bootstrap_icon "log-out" %} Log-out</a>
+			</li>
+			<hr class="bg-secondary" >
+			<li class="nav-item">
+				<a class="nav-link text-light {% if request.get_full_path == index_url %}active{% endif %}" href="{% url 'index' %}">{% bootstrap_icon "home" %} Home</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link {% if request.get_full_path == tasks_url %}active{% endif %}" href="{% url 'tasks' %}">All Tasks</a>
+				<a class="nav-link text-light {% if request.get_full_path == projects_url %}active{% endif %}" role="tab" href="{% url 'projects' %}">{% bootstrap_icon "list" %} All Projects</a>
 			</li>
-		  	<hr />
+			<li class="nav-item">
+				<a class="nav-link text-light {% if request.get_full_path == tasks_url %}active{% endif %}" href="{% url 'tasks' %}">{% bootstrap_icon "list" %} All Tasks</a>
+			</li>
+		  	<hr class="bg-secondary" >
 			{% url 'my-tasks' as my_tasks_url  %}
 			{% url 'my-reports' as my_reports_url %}
 			{% url 'project_create' as project_create_url %}
 			{% url 'task_create' as task_create_url %}
 			{% url 'report_create' as report_create_url %}
-		   	{% if user.is_authenticated %}
-			<li class="nav-item font-weight-bold">Hi, {{ user.last_name }} {{ user.first_name }}</li>
+
+			<li class="nav-item"><strong>Main Menu</strong></li>
 			 {% number_unread_tasks user as nut %}
 			<li class="nav-item">
-		 		<a class="nav-link {% if request.get_full_path == my_tasks_url %}active{% endif %}" href="{% url 'my-tasks' %}">My Task List <span class="badge">{% if nut > 0 %}{{ nut }}{% endif %}</span></a>
+		 		<a class="nav-link text-light {% if request.get_full_path == my_tasks_url %}active{% endif %}" href="{% url 'my-tasks' %}">{% bootstrap_icon "tasks" %} My Task List <span class="badge">{% if nut > 0 %}{{ nut }}{% endif %}</span></a>
 			</li>
 			<li class="nav-item">
-			 	<a class="nav-link {% if request.get_full_path == my_reports_url %}active{% endif %}" href="{% url 'my-reports' %}">My Report</a>
+			 	<a class="nav-link text-light {% if request.get_full_path == my_reports_url %}active{% endif %}" href="{% url 'my-reports' %}">{% bootstrap_icon "list-alt" %} My Report</a>
 			</li>
-			{% if perms.software.can_create_project %}
-			<li class="nav-item">
-			 	<a class="nav-link {% if request.get_full_path == project_create_url %}active{% endif %}" href="{% url 'project_create' %}">Create Project</a>
-			</li>
-			{% endif %}
+			
+
 			{% if perms.software.is_member %}
 			<li class="nav-item">
-			 	<a class="nav-link {% if request.get_full_path == task_create_url %}active{% endif %}" href="{% url 'task_create' %}">Create Task</a>
+			 	<a class="nav-link text-light {% if request.get_full_path == task_create_url %}active{% endif %}" href="{% url 'task_create' %}">{% bootstrap_icon "plus" %} Create Task</a>
 			</li>
 			<li class="nav-item">
-			 	<a class="nav-link {% if request.get_full_path == report_create_url %}active{% endif %}" href="{% url 'report_create' %}">Create Report</a>
+			 	<a class="nav-link text-light {% if request.get_full_path == report_create_url %}active{% endif %}" href="{% url 'report_create' %}">{% bootstrap_icon "plus" %} Create Report</a>
 			</li>
-			{% endif %}
-			<li class="nav-item">
-			 	<a class="nav-link" href="{% url 'logout'%}?next={{request.path}}">Logout</a>
-			</li>
+			
 		    {% endif %} 
+
 		  	{% load func_extras %}	  
 		  	{% if perms.software.is_leader %}
-		  	<hr />
+		  	<hr class="bg-secondary">
 		  	{% url 'all-tasked' as all_tasked_url %}
 		  	{% url 'my-team' as my_team_url %}
 		  	<li class="nav-item"><strong>Leader Menu</strong></li>
 		    {% if perms.software.is_leader %}
 		    {% empty_receiver request.user as empty_r %}
 		    <li class="nav-item">
-		   		<a class="nav-link {% if request.get_full_path == all_tasked_url %}active{% endif %}" href="{% url 'all-tasked' %}">All Team Tasks <span class="badge">{% if empty_r > 0 %}{{ empty_r }}{% endif %}</span></a></li>
+		   		<a class="nav-link text-light {% if request.get_full_path == all_tasked_url %}active{% endif %}" href="{% url 'all-tasked' %}">{% bootstrap_icon "tasks" %} All Team Tasks <span class="badge">{% if empty_r > 0 %}{{ empty_r }}{% endif %}</span></a></li>
 		    <li class="nav-item">
-		   		<a class="nav-link {% if request.get_full_path == my_team_url %}active{% endif %}" href="{% url 'my-team' %}">My Team</a>
+		   		<a class="nav-link text-light {% if request.get_full_path == my_team_url %}active{% endif %}" href="{% url 'my-team' %}">{% bootstrap_icon "modal-window" %} My Team</a>
 		    </li>
 		    {% endif %}
+
+		    {% if perms.software.can_create_project %}
+		    <hr class="bg-secondary">
+		    <li class="nav-item"><strong>Manager Menu</strong></li>		    
+			<li class="nav-item">
+			 	<a class="nav-link text-light {% if request.get_full_path == project_create_url %}active{% endif %}" href="{% url 'project_create' %}">{% bootstrap_icon "plus" %} Create Project</a>
+			</li>			
+			{% endif %}
 	  	</ul>
 	  	{% endif %}
 	  
