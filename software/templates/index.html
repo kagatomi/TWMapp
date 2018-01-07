@@ -59,13 +59,17 @@
   	<table class="table table-bordered table-hover">
   		<thead class="panel-heading"><th class="panel-title">Recently Projects</th></thead>
   		<tbody class="panel-body">
-  			<td>
-  			{% for p in all_projects|slice:":5" %}
-  			<p><a href="{{ p.get_absolute_url }}">{{ p }}</a></p>
-  			{% endfor %}
+        {% for p in all_projects|slice:":5" %}
+        {% new_project p as pnew %}
+        {% project_view p request.user as pread %}
+        <tr class="success {% if not pread %}font-weight-bold{% endif %}">
+          <td>{% if pnew %}<span class="label label-primary"> New </span>{% endif %}
+            <a href="{{ p.get_absolute_url }}">{{ p }}</a>
+          </td>
+        </tr>
+        {% endfor %}
         <tr><td colspan="2" class="text-center"><em><a href="{% url 'projects' %}" style="text-decoration-line: none">View all</a></em></td></tr>
-  			</td>
-  		</tbody>
+      </tbody>
   	</table>
   </div>
 </div>

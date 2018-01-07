@@ -45,6 +45,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 class ProjectListView(LoginRequiredMixin,generic.ListView):
     model = Project
     paginate_by = 10
+    ordering = ['-date_of_start']
 
 class ProjectDetailView(LoginRequiredMixin,generic.DetailView):
     model = Project
