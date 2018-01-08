@@ -24,6 +24,10 @@ h1 {
     list-style: none;
 }
 
+.content-area{
+	background-color: ivory;
+}
+
 a.active{
 	font-weight: bold;
 	color: cornflowerblue !important;
