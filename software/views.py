@@ -145,7 +145,7 @@ from django.urls import reverse_lazy
 class ProjectCreate(PermissionRequiredMixin, CreateView):
     model = Project
     fields = ['name', 'customer', 'description']
-    permission_required = 'software.can_create_project'
+    permission_required = 'software.is_manager'
 
     def form_valid(self, form):
         instance = form.save(commit=False)
@@ -163,7 +163,7 @@ class ProjectCreate(PermissionRequiredMixin, CreateView):
 class ProjectUpdate(PermissionRequiredMixin, UpdateView):
     model = Project
     fields = fields = ['name', 'customer', 'description']
-    permission_required = 'software.can_create_project'
+    permission_required = 'software.is_manager'
 
     def form_valid(self, form):
         instance = form.save(commit=False)
@@ -180,7 +180,7 @@ class ProjectUpdate(PermissionRequiredMixin, UpdateView):
 class ProjectDelete(PermissionRequiredMixin, DeleteView):
     model = Project
     success_url = reverse_lazy('projects')
-    permission_required = 'software.can_create_project'
+    permission_required = 'software.is_manager'
 
     def delete(self, request, *args, **kwargs):
                 

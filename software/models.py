@@ -93,7 +93,7 @@ class Task(models.Model):
     class Meta:
         unique_together = (('title', 'project'))
         ordering = ["deadline"]
-        permissions = (("can_create_project", "Manager"),
+        permissions = (("is_manager", "Manager"),
                        ("is_member", "Member"),
                        ("is_leader","Leader"),)
 
