@@ -33,7 +33,7 @@
 		{% url 'tasks' as tasks_url %}
 		<ul class="sidebar-nav nav-stacked" role="tablist" data-spy="affix" data-offset-top="-1">
 			<li class="nav-item font-weight-bold">Hi, {{ user.last_name }} {{ user.first_name }}
-				({% if perms.software.can_create_project %}Manager{% elif perms.software.is_leader %}Leader{% else %}Member{% endif %})
+				({% if perms.software.is_manager %}Manager{% elif perms.software.is_leader %}Leader{% else %}Member{% endif %})
 			</li>
 			<li class="nav-item">
 			 	<a class="nav-link text-light" href="{% url 'logout'%}?next={{request.path}}">{% bootstrap_icon "log-out" %} Log-out</a>
