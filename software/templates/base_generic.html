@@ -81,7 +81,6 @@
 		  	{% url 'all-tasked' as all_tasked_url %}
 		  	{% url 'my-team' as my_team_url %}
 		  	<li class="nav-item"><strong>Leader Menu</strong></li>
-		    {% if perms.software.is_leader %}
 		    {% empty_receiver request.user as empty_r %}
 		    <li class="nav-item">
 		   		<a class="nav-link text-light {% if request.get_full_path == all_tasked_url %}active{% endif %}" href="{% url 'all-tasked' %}">{% bootstrap_icon "tasks" %} All Team Tasks <span class="badge">{% if empty_r > 0 %}{{ empty_r }}{% endif %}</span></a></li>
